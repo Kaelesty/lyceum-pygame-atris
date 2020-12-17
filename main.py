@@ -34,22 +34,20 @@ if __name__ == '__main__':
                 if main_status == "wfa":
                     if check_click(event.pos[0], event.pos[1], 480, 620, 320, 64):
                         main_status = "omm"
+                        mp.init_main_menu()
                         screen.fill((100, 0, 100))
             else:
                 if mp.buttons != False and main_status == "omm":
-                    print(123)
                     group = list(mp.buttons)
                     for i in range(len(group)):
-                        print(group[i].rect.collidepoint(pygame.mouse.get_pos()))
-                        if group[i].rect.collidepoint(pygame.mouse.get_pos()) == 1:
+                        if group[i].rect.collidepoint(pygame.mouse.get_pos()):
                             group[i].change_stat("uw")
                         else:
                             group[i].change_stat("st")
                     btns = pygame.sprite.Group()
-                    print(group)
                     for elem in group:
                         btns.add(elem)
-                    mp.buttons = btns
+                    mp.upload_buttons(btns)
                     mp.buttons.draw(screen)
         clock.tick(fps)
         pygame.display.flip()
