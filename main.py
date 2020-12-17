@@ -1,8 +1,15 @@
 import pygame
-import paint_main_menu
+from menu_painter import MenuPainter
 
 # game stats:
 # omm - on main menu
+# wfa - wait for activity
+
+def check_click(x_pos, y_pos, x_left, y_top, width, height):
+    if x_left <= x_pos <= x_left + width:
+        if y_top <= y_pos <= y_top + height:
+            return True
+    return False
 
 if __name__ == '__main__':
     fps = 30
@@ -13,14 +20,37 @@ if __name__ == '__main__':
     screen.fill((0, 0, 0))
     running = True
     pygame.display.set_caption('Atris - Main')
-    main_status = 'omm'
+    main_status = 'wfa'
+    mp = MenuPainter(screen)
     while running:
-        screen.fill((0, 0, 0))
+        if main_status == 'omm':
+            mp.draw_main_menu()
+        if main_status == "wfa":
+            mp.draw_waiting()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-        if main_status == 'omm':
-            paint_main_menu()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if main_status == "wfa":
+                    if check_click(event.pos[0], event.pos[1], 480, 620, 320, 64):
+                        main_status = "omm"
+                        screen.fill((100, 0, 100))
+            else:
+                if mp.buttons != False and main_status == "omm":
+                    print(123)
+                    group = list(mp.buttons)
+                    for i in range(len(group)):
+                        print(group[i].rect.collidepoint(pygame.mouse.get_pos()))
+                        if group[i].rect.collidepoint(pygame.mouse.get_pos()) == 1:
+                            group[i].change_stat("uw")
+                        else:
+                            group[i].change_stat("st")
+                    btns = pygame.sprite.Group()
+                    print(group)
+                    for elem in group:
+                        btns.add(elem)
+                    mp.buttons = btns
+                    mp.buttons.draw(screen)
         clock.tick(fps)
         pygame.display.flip()
     pygame.quit()
