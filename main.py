@@ -1,4 +1,8 @@
 import pygame
+import paint_main_menu
+
+# game stats:
+# omm - on main menu
 
 if __name__ == '__main__':
     fps = 30
@@ -15,6 +19,8 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+        if main_status == 'omm':
+            paint_main_menu()
         clock.tick(fps)
         pygame.display.flip()
     pygame.quit()
