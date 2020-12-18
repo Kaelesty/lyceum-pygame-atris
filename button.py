@@ -2,6 +2,7 @@ import pygame
 
 # sizes desc
 # standart - 150x32
+# extended - 300x100
 
 class Button(pygame.sprite.Sprite):
     def __init__(self, btnname, stat,  *group, size="standart"):
@@ -15,6 +16,7 @@ class Button(pygame.sprite.Sprite):
         if size == 'standart':
             self.rect.x = 150
             self.rect.y = 32
+        self.stat = stat
 
     def change_stat(self, stat):
         self.stat = stat

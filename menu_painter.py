@@ -18,6 +18,8 @@ class MenuPainter:
         self.buttons.draw(self.surface)
         self.falls = pygame.sprite.Group()
 
+    def init_selector(self):
+        self.buttons = pygame.sprite.Group()
 
     def upload_buttons(self, buttons):
         self.buttons = buttons
@@ -89,5 +91,30 @@ class MenuPainter:
         for elem in group:
             self.falls.add(elem)
         self.falls.draw(self.surface)
+
+    def draw_selector(self):
+        decorations = pygame.sprite.Group()
+        sprite = pygame.sprite.Sprite()
+        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                         "border.png")
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 0
+        sprite.rect.y = 0
+        decorations.add(sprite)
+        sprite = pygame.sprite.Sprite()
+        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                         "tetris_border.png")
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 50
+        sprite.rect.y = 50
+        decorations.add(sprite)
+        sprite = pygame.sprite.Sprite()
+        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                         "tetris_st.png")
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 120
+        sprite.rect.y = 110
+        decorations.add(sprite)
+        decorations.draw(self.surface)
 
 
