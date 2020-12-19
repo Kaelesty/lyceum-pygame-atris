@@ -5,6 +5,7 @@ from menu_painter import MenuPainter
 # omm - on main menu
 # wfa - wait for activity
 # gmc - game mode choosing
+# ig-cl - in game classic
 
 def check_click(x_pos, y_pos, x_left, y_top, width, height):
     if x_left <= x_pos <= x_left + width:
@@ -17,6 +18,9 @@ def button_reaction(name):
     if name == 'play':
         main_status = 'gmc'
         mp.init_selector()
+    if name == 'classic':
+        main_status = 'ig-cl'
+        mp.init_classic()
 
 
 if __name__ == '__main__':
@@ -33,10 +37,13 @@ if __name__ == '__main__':
         screen.fill((0, 0, 0))
         if main_status == 'omm':
             mp.draw_main_menu()
-        if main_status == "wfa":
+        elif main_status == "wfa":
             mp.draw_waiting()
-        if main_status == 'gmc':
+        elif main_status == 'gmc':
             mp.draw_selector()
+        elif main_status == 'ig-cl':
+            mp.draw_and_step()
+            fps = 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -46,7 +53,7 @@ if __name__ == '__main__':
                         main_status = "omm"
                         mp.init_main_menu()
                         screen.fill((100, 0, 100))
-                elif main_status == "omm":
+                elif main_status in ["omm", "gmc"]:
                     group = list(mp.buttons)
                     for i in range(len(list(mp.buttons))):
                         if group[i].rect.collidepoint(event.pos):
@@ -64,12 +71,12 @@ if __name__ == '__main__':
                             button_reaction(group[i].name)
                         else:
                             group[i].change_stat('st')
-                sprites = pygame.sprite.Group()
-                for elem in group:
-                    sprites.add(elem)
-                mp.buttons = sprites
+                            sprites = pygame.sprite.Group()
+                            for elem in group:
+                                sprites.add(elem)
+                            mp.buttons = sprites
             else:
-                if mp.buttons != False and main_status == "omm":
+                if mp.buttons != False and main_status in ['omm', 'gmc']:
                     group = list(mp.buttons)
                     for i in range(len(group)):
                         if group[i].rect.collidepoint(pygame.mouse.get_pos()):
@@ -80,7 +87,6 @@ if __name__ == '__main__':
                     for elem in group:
                         btns.add(elem)
                     mp.upload_buttons(btns)
-                    mp.buttons.draw(screen)
         clock.tick(fps)
         pygame.display.flip()
     pygame.quit()

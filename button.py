@@ -16,6 +16,9 @@ class Button(pygame.sprite.Sprite):
         if size == 'standart':
             self.rect.x = 150
             self.rect.y = 32
+        elif size == "extended":
+            self.rect.x = 300
+            self.rect.y = 100
         self.stat = stat
 
     def change_stat(self, stat):

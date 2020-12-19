@@ -1,6 +1,7 @@
 import pygame
 import random
 from button import Button
+from tetris import Tetris
 
 
 class MenuPainter:
@@ -20,6 +21,16 @@ class MenuPainter:
 
     def init_selector(self):
         self.buttons = pygame.sprite.Group()
+        sprite = Button('classic', "st", self.buttons)
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 200
+        sprite.rect.y = 320
+        self.buttons.add(sprite)
+        self.buttons.draw(self.surface)
+
+    def init_classic(self):
+        self.buttons = pygame.sprite.Group()
+        self.tetris = Tetris(self.surface, 'classic', (640, 10))
 
     def upload_buttons(self, buttons):
         self.buttons = buttons
@@ -116,5 +127,10 @@ class MenuPainter:
         sprite.rect.y = 110
         decorations.add(sprite)
         decorations.draw(self.surface)
+        self.buttons.draw(self.surface)
+
+    def draw_and_step(self):
+        self.tetris.make_step()
+        self.tetris.draw_self()
 
 
