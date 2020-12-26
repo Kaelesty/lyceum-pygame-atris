@@ -133,5 +133,3 @@ class MenuPainter:
     def draw_and_step(self):
         self.tetris.make_step()
         self.tetris.draw_self()
-
-

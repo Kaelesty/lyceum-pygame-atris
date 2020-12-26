@@ -2,6 +2,7 @@ import pygame
 import random
 import copy
 
+
 # minos
 # 1 - line
 # 2 - cube
@@ -36,7 +37,7 @@ class Tetris:
                 unstatic_blocks_board = []
                 for i in range(20):
                     for j in range(10):
-                        if self.board[i][j] != []:
+                        if self.board[i][j]:
                             if self.board[i][j][0] != "_":
                                 if (j == 9 and move == 1) or (j == 0 and move == -1):
                                     can_do_step = False
@@ -131,15 +132,13 @@ class Tetris:
             self.hat[3][x_pos + 1] = color
             self.hat[2][x_pos + 1] = color
 
-
-
-
     def draw_self(self):
         sprites = pygame.sprite.Group()
         for i in range(20):
             for j in range(10):
                 if i >= 5:
-                    pygame.draw.rect(self.surface, (255, 255, 255), (self.pos[0] + 35 * j, self.pos[1] + 35 * i, 35, 35), width=1)
+                    pygame.draw.rect(self.surface, (255, 255, 255),
+                                     (self.pos[0] + 35 * j, self.pos[1] + 35 * i, 35, 35), width=1)
                     if self.board[i][j] != []:
                         sprite = pygame.sprite.Sprite()
                         try:
@@ -157,4 +156,3 @@ class Tetris:
                         sprite.rect.y = self.pos[1] + 35 * i
                         sprites.add(sprite)
         sprites.draw(self.surface)
-

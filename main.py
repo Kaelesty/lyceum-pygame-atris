@@ -1,6 +1,7 @@
 import pygame
 from menu_painter import MenuPainter
 
+
 # game stats:
 # omm - on main menu
 # wfa - wait for activity
@@ -12,6 +13,7 @@ def check_click(x_pos, y_pos, x_left, y_top, width, height):
         if y_top <= y_pos <= y_top + height:
             return True
     return False
+
 
 def button_reaction(name):
     global main_status, mp
