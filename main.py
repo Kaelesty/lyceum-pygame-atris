@@ -43,7 +43,7 @@ if __name__ == '__main__':
             mp.draw_selector()
         elif main_status == 'ig-cl':
             mp.draw_and_step()
-            fps = 1
+            fps = 5
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -62,6 +62,9 @@ if __name__ == '__main__':
                     for elem in group:
                         sprites.add(elem)
                     mp.buttons = sprites
+            elif event.type == pygame.KEYDOWN:
+                if main_status == "ig-cl":
+                    mp.tetris.catch(event)
             elif event.type == pygame.MOUSEBUTTONUP:
                 group = list(mp.buttons)
                 for i in range(len(list(mp.buttons))):
