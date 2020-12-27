@@ -68,7 +68,10 @@ if __name__ == '__main__':
                 if main_status == "ig-cl":
                     mp.tetris.catch(event)
             elif event.type == pygame.MOUSEBUTTONUP:
-                group = list(mp.buttons)
+                try:
+                    group = list(mp.buttons)
+                except TypeError:
+                    break
                 for i in range(len(list(mp.buttons))):
                     if group[i].stat == 'ps':
                         if group[i].rect.collidepoint(event.pos):

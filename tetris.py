@@ -13,6 +13,11 @@ import copy
 # b - blocked
 # c - curr
 
+class StupidCoderError(Exception):
+    def __init__(self):
+        pass
+
+
 class Tetris:
     def __init__(self, screen, mode, pos):
         self.surface = screen
@@ -23,6 +28,119 @@ class Tetris:
         self.pos = pos
         self.game = 1
         self.next = random.randrange(1, 6)
+
+    def rotate(self):
+        if self.hat == [[[]] * 10 for _ in range(6)] and self.figure != 2:
+            currs = list()
+            for i in range(20):
+                for j in range(10):
+                    if self.board[i][j] != []:
+                        if self.board[i][j][0] != '_':
+                            if self.board[i][j][-1] != '_':
+                                currs.append((j, i))
+                            else:
+                                center = (j, i)
+            old_currs = copy.deepcopy(currs)
+            if self.figure == 1:
+                if center[1] == currs[0][1]:  # it is hori
+                    currs = list()
+                    currs.append((center[0], center[1] - 1))
+                    currs.append((center[0], center[1] + 1))
+                    currs.append((center[0], center[1] + 2))
+                elif center[0] == currs[0][0]:  # it is vert
+                    currs = list()
+                    currs.append((center[0] - 1, center[1]))
+                    currs.append((center[0] + 2, center[1]))
+                    currs.append((center[0] + 1, center[1]))
+                else:
+                    # just why?
+                    raise StupidCoderError
+            if self.figure == 3:
+                if (center[0] + 1, center[1] + 1) in currs and (center[0], center[1] + 1) in currs:
+                    # rotation is 1. will be 2
+                    currs = list()
+                    currs.append((center[0] - 1, center[1]))
+                    currs.append((center[0] + 1, center[1]))
+                    currs.append((center[0] + 1, center[1] + 1))
+                elif (center[0] + 1, center[1]) in currs and (center[0] + 1, center[1] + 1) in currs:
+                    # rotation is 2. will be 3
+                    currs = list()
+                    currs.append((center[0], center[1] - 1))
+                    currs.append((center[0], center[1] + 1))
+                    currs.append((center[0] - 1, center[1] + 1))
+                elif (center[0], center[1] + 1) in currs and (center[0] - 1, center[1] + 1) in currs:
+                    # rotatios is 3. will be 4
+                    currs = list()
+                    currs.append((center[0] + 1, center[1]))
+                    currs.append((center[0] - 1, center[1]))
+                    currs.append((center[0] - 1, center[1] + 1))
+                elif (center[0], center[1] + 1) in currs and (center[0] - 1, center[1] + 1) in currs:
+                    # rotatios is 4. will be 1
+                    currs = list()
+                    currs.append((center[0] + 1, center[1] + 1))
+                    currs.append((center[0], center[1] - 1))
+                    currs.append((center[0], center[1] + 1))
+                else:
+                    raise StupidCoderError
+            elif self.figure == 4:
+                if not ((center[0], center[1] - 1) in currs):
+                    # rotation is 1. will be 2
+                    currs = list()
+                    # currs.append((center[0] + 1, center[1]))
+                    currs.append((center[0] - 1, center[1]))
+                    currs.append((center[0], center[1] + 1))
+                    currs.append((center[0], center[1] - 1))
+                elif not ((center[0] + 1, center[1]) in currs):
+                    # rotation is 2. will be 3
+                    currs = list()
+                    currs.append((center[0] + 1, center[1]))
+                    currs.append((center[0] - 1, center[1]))
+                    # currs.append((center[0], center[1] + 1))
+                    currs.append((center[0], center[1] - 1))
+                elif not ((center[0], center[1] + 1) in currs):
+                    # rotation is 3. will be 4
+                    currs = list()
+                    currs.append((center[0] + 1, center[1]))
+                    # currs.append((center[0] - 1, center[1]))
+                    currs.append((center[0], center[1] + 1))
+                    currs.append((center[0], center[1] - 1))
+                elif not ((center[0] - 1, center[1]) in currs):
+                    # rotation is 4. will be 1
+                    currs = list()
+                    currs.append((center[0] + 1, center[1]))
+                    currs.append((center[0] - 1, center[1]))
+                    # currs.append((center[0], center[1] + 1))
+                    currs.append((center[0], center[1] - 1))
+                else:
+                    raise StupidCoderError
+            elif self.figure == 5:
+                if (center[0] - 1, center[1]) in currs and (center[0] - 1, center[1] + 1) in currs:
+                    # rotation is 1. will be 2
+                    currs = list()
+                    currs.append((center[0] - 1, center[1]))
+                    currs.append((center[0], center[1] + 1))
+                    currs.append((center[0] + 1, center[1] + 1))
+                elif (center[0], center[1] + 1) in currs and (center[0] + 1, center[1] + 1) in currs:
+                    # rotation is 2. will be 1
+                    currs = list()
+                    currs.append((center[0] - 1, center[1]))
+                    currs.append((center[0] - 1, center[1] - 1))
+                    currs.append((center[0], center[1] + 1))
+                else:
+                    raise StupidCoderError
+            can_rotate = True
+            for elem in currs:
+                if not (0 < elem[1] < 19 and 0 < elem[0] < 9):
+                    can_rotate = False
+                if self.board[elem[1]][elem[0]] != []:
+                    if self.board[elem[1]][elem[0]][0] == '_':
+                        can_rotate = False
+            if can_rotate and self.figure != 2:
+                for elem in old_currs:
+                    color = self.board[elem[1]][elem[0]]
+                    self.board[elem[1]][elem[0]] = []
+                for elem in currs:
+                    self.board[elem[1]][elem[0]] = color
 
     def catch(self, event):
         if event.key == 32:
@@ -113,7 +231,7 @@ class Tetris:
         self.hat[4][x_pos] = color
         if figure == 1:
             self.hat[3][x_pos] = color
-            self.hat[2][x_pos] = color
+            self.hat[2][x_pos] = color + '_'
             self.hat[1][x_pos] = color
         elif figure == 2:
             self.hat[3][x_pos] = color
@@ -121,16 +239,17 @@ class Tetris:
             self.hat[3][x_pos + 1] = color
         elif figure == 3:
             self.hat[4][x_pos + 1] = color
-            self.hat[3][x_pos] = color
+            self.hat[3][x_pos] = color + "_"
             self.hat[2][x_pos] = color
         elif figure == 4:
-            self.hat[3][x_pos] = color
+            self.hat[3][x_pos] = color + "_"
             self.hat[3][x_pos + 1] = color
             self.hat[2][x_pos] = color
         elif figure == 5:
             self.hat[3][x_pos] = color
-            self.hat[3][x_pos + 1] = color
+            self.hat[3][x_pos + 1] = color + '_'
             self.hat[2][x_pos + 1] = color
+        self.figure = figure
 
     def draw_self(self):
         sprites = pygame.sprite.Group()
@@ -141,16 +260,16 @@ class Tetris:
                                      (self.pos[0] + 35 * j, self.pos[1] + 35 * i, 35, 35), width=1)
                     if self.board[i][j] != []:
                         sprite = pygame.sprite.Sprite()
-                        try:
-                            if self.board[i][j][0] != "_":
-                                sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
-                                                                 f"cube_{self.board[i][j]}.png")
-                            else:
-                                sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
-                                                                 f"cube_{self.board[i][j][1:]}.png")
-                        except FileNotFoundError:
-                            print("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
-                                  f"cube_{self.board[i][j]}.png")
+                        if self.board[i][j][0] == "_" and self.board[i][j][-1] == "_":
+                            color = self.board[i][j][1:-1]
+                        elif self.board[i][j][0] == "_":
+                            color = self.board[i][j][1:]
+                        elif self.board[i][j][-1] == "_":
+                            color = self.board[i][j][:-1]
+                        else:
+                            color = self.board[i][j]
+                        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                                         f"cube_{color}.png")
                         sprite.rect = sprite.image.get_rect()
                         sprite.rect.x = self.pos[0] + 35 * j
                         sprite.rect.y = self.pos[1] + 35 * i
