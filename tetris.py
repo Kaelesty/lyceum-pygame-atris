@@ -9,9 +9,6 @@ import copy
 # 3 - g
 # 4 - cross
 # 5 - z
-# defs
-# b - blocked
-# c - curr
 
 class StupidCoderError(Exception):
     def __init__(self):
@@ -28,6 +25,20 @@ class Tetris:
         self.pos = pos
         self.game = 1
         self.next = random.randrange(1, 6)
+
+    def check_full_lines(self):
+        returned = []
+        for i in range(20):
+            flag = True
+            for j in range(10):
+                if self.board[i][j] != []:
+                    if self.board[i][j][0] != '_':
+                        flag = False
+                else:
+                    flag = False
+            if flag:
+                returned.append(i)
+        return returned
 
     def rotate(self):
         if self.hat == [[[]] * 10 for _ in range(6)] and self.figure != 2:
@@ -73,7 +84,7 @@ class Tetris:
                     currs = list()
                     currs.append((center[0] + 1, center[1]))
                     currs.append((center[0] - 1, center[1]))
-                    currs.append((center[0] - 1, center[1] + 1))
+                    currs.append((center[0] - 1, center[1] - 1))
                 elif (center[0], center[1] + 1) in currs and (center[0] - 1, center[1] + 1) in currs:
                     # rotatios is 4. will be 1
                     currs = list()
@@ -110,7 +121,7 @@ class Tetris:
                     currs.append((center[0] + 1, center[1]))
                     currs.append((center[0] - 1, center[1]))
                     # currs.append((center[0], center[1] + 1))
-                    currs.append((center[0], center[1] - 1))
+                    currs.append((center[0], center[1] + 1))
                 else:
                     raise StupidCoderError
             elif self.figure == 5:
@@ -127,7 +138,7 @@ class Tetris:
                     currs.append((center[0] - 1, center[1] - 1))
                     currs.append((center[0], center[1] + 1))
                 else:
-                    raise StupidCoderError
+                    print(center)
             can_rotate = True
             for elem in currs:
                 if not (0 < elem[1] < 19 and 0 < elem[0] < 9):
@@ -143,7 +154,12 @@ class Tetris:
                     self.board[elem[1]][elem[0]] = color
 
     def catch(self, event):
-        if event.key == 32:
+        if event.key == 27:
+            if self.game == 0:
+                self.game = 1
+            else:
+                self.game = 0
+        elif event.key == 32:
             self.rotate()
         elif event.key in (97, 100):
             if event.key == 97:
@@ -224,6 +240,9 @@ class Tetris:
             unstatic_blocks = sorted(unstatic_blocks, key=lambda x: -int(x[1]))
             for elem in unstatic_blocks:
                 self.hat[elem[1]][elem[0]], self.hat[elem[1] + 1][elem[0]] = [], self.hat[elem[1]][elem[0]]
+            for elem in self.check_full_lines():
+                for i in range(elem, 0, -1):
+                    self.board[i] = self.board[i - 1]
 
     def new_curr(self):
         figure, self.next, x_pos = self.next, random.randrange(1, 6), random.randrange(0, 8)
@@ -246,9 +265,9 @@ class Tetris:
             self.hat[3][x_pos + 1] = color
             self.hat[2][x_pos] = color
         elif figure == 5:
-            self.hat[3][x_pos] = color
-            self.hat[3][x_pos + 1] = color + '_'
-            self.hat[2][x_pos + 1] = color
+            self.hat[2][x_pos - 1] = color
+            self.hat[3][x_pos - 1] = color
+            self.hat[3][x_pos] = color + "_"
         self.figure = figure
 
     def draw_self(self):
@@ -256,7 +275,7 @@ class Tetris:
         for i in range(20):
             for j in range(10):
                 if i >= 5:
-                    pygame.draw.rect(self.surface, (255, 255, 255),
+                    pygame.draw.rect(self.surface, (255, 190, 15),
                                      (self.pos[0] + 35 * j, self.pos[1] + 35 * i, 35, 35), width=1)
                     if self.board[i][j] != []:
                         sprite = pygame.sprite.Sprite()
@@ -274,4 +293,13 @@ class Tetris:
                         sprite.rect.x = self.pos[0] + 35 * j
                         sprite.rect.y = self.pos[1] + 35 * i
                         sprites.add(sprite)
+        if self.game == 0:
+            sprite1 = pygame.sprite.Sprite()
+            sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                             "paused.png")
+            sprite1.rect = sprite.image.get_rect()
+            sprite1.rect.x = self.pos[0] + 25
+            sprite1.rect.y = self.pos[1] + 415
+            sprites.add(sprite1)
         sprites.draw(self.surface)
+
