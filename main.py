@@ -22,7 +22,7 @@ def button_reaction(name):
         mp.init_selector()
     if name == 'classic':
         main_status = 'ig-cl'
-        mp.init_classic()
+        mp.init_classic(name)
 
 
 if __name__ == '__main__':
@@ -66,7 +66,11 @@ if __name__ == '__main__':
                     mp.buttons = sprites
             elif event.type == pygame.KEYDOWN:
                 if main_status == "ig-cl":
-                    mp.tetris.catch(event)
+                    if event.key != 120:
+                        mp.tetris.catch(event)
+                    else:
+                        if mp.tetris.game == 0:
+                            mp.tetris.terminate()
             elif event.type == pygame.MOUSEBUTTONUP:
                 try:
                     group = list(mp.buttons)

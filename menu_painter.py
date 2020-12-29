@@ -28,9 +28,11 @@ class MenuPainter:
         self.buttons.add(sprite)
         self.buttons.draw(self.surface)
 
-    def init_classic(self):
+    def init_classic(self, mode):
+        if mode == "classic":
+            mode = "easy"
         self.buttons = pygame.sprite.Group()
-        self.tetris = Tetris(self.surface, 'classic', (465, 0))
+        self.tetris = Tetris(self.surface, mode, (465, 0))
         self.tetris.new_curr()
 
     def upload_buttons(self, buttons):
