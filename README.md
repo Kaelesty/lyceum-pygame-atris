@@ -1,5 +1,5 @@
 # Atris
 Project for YL
 #
-Интерфейс СУПЕР-ПРЕДВАРИТЕЛЬНЫЙ
+Tetris, but Atris
 #
