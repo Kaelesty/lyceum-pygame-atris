@@ -23,6 +23,12 @@ def button_reaction(name):
     if name == 'classic':
         main_status = 'ig-cl'
         mp.init_classic(name)
+    if name == "normal":
+        main_status = 'ig-cl'
+        mp.init_classic(name)
+    if name == "hard":
+        main_status = 'ig-cl'
+        mp.init_classic(name)
 
 
 if __name__ == '__main__':
@@ -71,6 +77,9 @@ if __name__ == '__main__':
                     else:
                         if mp.tetris.game == 0:
                             mp.tetris.terminate()
+                            main_status = "gmc"
+                            mp.tetris = 0
+                            mp.init_selector()
             elif event.type == pygame.MOUSEBUTTONUP:
                 try:
                     group = list(mp.buttons)

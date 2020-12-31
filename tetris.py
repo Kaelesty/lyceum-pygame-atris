@@ -3,6 +3,10 @@ import random
 import copy
 import sqlite3
 
+# GAME MODES:
+# easy : показывается след. фигура, можно вращать фигуры на паузе
+# normal : нельзя вращать фигуры на паузе
+# hard : след. фигура не показывается
 
 # minos
 # 1 - line
@@ -10,6 +14,7 @@ import sqlite3
 # 3 - g
 # 4 - cross
 # 5 - z
+
 
 class StupidCoderError(Exception):
     def __init__(self):
@@ -27,13 +32,18 @@ class Tetris:
         self.game = 1
         self.next = random.randrange(1, 6)
         self.score = 0
+        self.secondary_pos = (self.pos[0] + 350, self.pos[1])
 
     def terminate(self):
         con = sqlite3.connect("Data\ "[0:-1] + "AData.sqlite")
         cur = con.cursor()
         data = cur.execute(f"SELECT Classic_{self.mode} FROM Scores").fetchall()
-        if list(data)[0] < self.score:
+        print(list(data)[0][0])
+        print(self.score)
+        print(f"UPDATE Scores SET Classic_{self.mode} = {self.score}")
+        if list(data)[0][0] < self.score:
             cur.execute(f"UPDATE Scores SET Classic_{self.mode} = {self.score}")
+        con.commit()
         con.close()
         # i will be back
 
@@ -52,120 +62,121 @@ class Tetris:
         return returned
 
     def rotate(self):
-        try:
-            if self.hat == [[[]] * 10 for _ in range(6)] and self.figure != 2:
-                currs = list()
-                for i in range(20):
-                    for j in range(10):
-                        if self.board[i][j] != []:
-                            if self.board[i][j][0] != '_':
-                                if self.board[i][j][-1] != '_':
-                                    currs.append((j, i))
-                                else:
-                                    center = (j, i)
-                old_currs = copy.deepcopy(currs)
-                if self.figure == 1:
-                    if center[1] == currs[0][1]:  # it is hori
-                        currs = list()
-                        currs.append((center[0], center[1] - 1))
-                        currs.append((center[0], center[1] + 1))
-                        currs.append((center[0], center[1] + 2))
-                    elif center[0] == currs[0][0]:  # it is vert
-                        currs = list()
-                        currs.append((center[0] - 1, center[1]))
-                        currs.append((center[0] + 2, center[1]))
-                        currs.append((center[0] + 1, center[1]))
-                    else:
-                        # just why?
-                        raise StupidCoderError
-                if self.figure == 3:
-                    if (center[0] + 1, center[1] + 1) in currs and (center[0], center[1] + 1) in currs:
-                        # rotation is 1. will be 2
-                        currs = list()
-                        currs.append((center[0] - 1, center[1]))
-                        currs.append((center[0] + 1, center[1]))
-                        currs.append((center[0] + 1, center[1] + 1))
-                    elif (center[0] + 1, center[1]) in currs and (center[0] + 1, center[1] + 1) in currs:
-                        # rotation is 2. will be 3
-                        currs = list()
-                        currs.append((center[0], center[1] - 1))
-                        currs.append((center[0], center[1] + 1))
-                        currs.append((center[0] - 1, center[1] + 1))
-                    elif (center[0], center[1] + 1) in currs and (center[0] - 1, center[1] + 1) in currs:
-                        # rotatios is 3. will be 4
-                        currs = list()
-                        currs.append((center[0] + 1, center[1]))
-                        currs.append((center[0] - 1, center[1]))
-                        currs.append((center[0] - 1, center[1] - 1))
-                    elif (center[0], center[1] + 1) in currs and (center[0] - 1, center[1] + 1) in currs:
-                        # rotatios is 4. will be 1
-                        currs = list()
-                        currs.append((center[0] + 1, center[1] + 1))
-                        currs.append((center[0], center[1] - 1))
-                        currs.append((center[0], center[1] + 1))
-                    else:
-                        raise StupidCoderError
-                elif self.figure == 4:
-                    if not ((center[0], center[1] - 1) in currs):
-                        # rotation is 1. will be 2
-                        currs = list()
-                        # currs.append((center[0] + 1, center[1]))
-                        currs.append((center[0] - 1, center[1]))
-                        currs.append((center[0], center[1] + 1))
-                        currs.append((center[0], center[1] - 1))
-                    elif not ((center[0] + 1, center[1]) in currs):
-                        # rotation is 2. will be 3
-                        currs = list()
-                        currs.append((center[0] + 1, center[1]))
-                        currs.append((center[0] - 1, center[1]))
-                        # currs.append((center[0], center[1] + 1))
-                        currs.append((center[0], center[1] - 1))
-                    elif not ((center[0], center[1] + 1) in currs):
-                        # rotation is 3. will be 4
-                        currs = list()
-                        currs.append((center[0] + 1, center[1]))
-                        # currs.append((center[0] - 1, center[1]))
-                        currs.append((center[0], center[1] + 1))
-                        currs.append((center[0], center[1] - 1))
-                    elif not ((center[0] - 1, center[1]) in currs):
-                        # rotation is 4. will be 1
-                        currs = list()
-                        currs.append((center[0] + 1, center[1]))
-                        currs.append((center[0] - 1, center[1]))
-                        # currs.append((center[0], center[1] + 1))
-                        currs.append((center[0], center[1] + 1))
-                    else:
-                        raise StupidCoderError
-                elif self.figure == 5:
-                    if (center[0] - 1, center[1]) in currs and (center[0] - 1, center[1] + 1) in currs:
-                        # rotation is 1. will be 2
-                        currs = list()
-                        currs.append((center[0] - 1, center[1]))
-                        currs.append((center[0], center[1] + 1))
-                        currs.append((center[0] + 1, center[1] + 1))
-                    elif (center[0], center[1] + 1) in currs and (center[0] + 1, center[1] + 1) in currs:
-                        # rotation is 2. will be 1
-                        currs = list()
-                        currs.append((center[0] - 1, center[1]))
-                        currs.append((center[0] - 1, center[1] - 1))
-                        currs.append((center[0], center[1] + 1))
-                    else:
-                        print(center)
-                can_rotate = True
-                for elem in currs:
-                    if not (0 < elem[1] < 19 and 0 < elem[0] < 9):
-                        can_rotate = False
-                    if self.board[elem[1]][elem[0]] != []:
-                        if self.board[elem[1]][elem[0]][0] == '_':
-                            can_rotate = False
-                if can_rotate and self.figure != 2:
-                    for elem in old_currs:
-                        color = self.board[elem[1]][elem[0]]
-                        self.board[elem[1]][elem[0]] = []
+        if self.game == 1 or self.mode == "classic":
+            try:
+                if self.hat == [[[]] * 10 for _ in range(6)] and self.figure != 2:
+                    currs = list()
+                    for i in range(20):
+                        for j in range(10):
+                            if self.board[i][j] != []:
+                                if self.board[i][j][0] != '_':
+                                    if self.board[i][j][-1] != '_':
+                                        currs.append((j, i))
+                                    else:
+                                        center = (j, i)
+                    old_currs = copy.deepcopy(currs)
+                    if self.figure == 1:
+                        if center[1] == currs[0][1]:  # it is hori
+                            currs = list()
+                            currs.append((center[0], center[1] - 1))
+                            currs.append((center[0], center[1] + 1))
+                            currs.append((center[0], center[1] + 2))
+                        elif center[0] == currs[0][0]:  # it is vert
+                            currs = list()
+                            currs.append((center[0] - 1, center[1]))
+                            currs.append((center[0] + 2, center[1]))
+                            currs.append((center[0] + 1, center[1]))
+                        else:
+                            # just why?
+                            raise StupidCoderError
+                    if self.figure == 3:
+                        if (center[0] + 1, center[1] + 1) in currs and (center[0], center[1] + 1) in currs:
+                            # rotation is 1. will be 2
+                            currs = list()
+                            currs.append((center[0] - 1, center[1]))
+                            currs.append((center[0] + 1, center[1]))
+                            currs.append((center[0] + 1, center[1] + 1))
+                        elif (center[0] + 1, center[1]) in currs and (center[0] + 1, center[1] + 1) in currs:
+                            # rotation is 2. will be 3
+                            currs = list()
+                            currs.append((center[0], center[1] - 1))
+                            currs.append((center[0], center[1] + 1))
+                            currs.append((center[0] - 1, center[1] + 1))
+                        elif (center[0], center[1] + 1) in currs and (center[0] - 1, center[1] + 1) in currs:
+                            # rotatios is 3. will be 4
+                            currs = list()
+                            currs.append((center[0] + 1, center[1]))
+                            currs.append((center[0] - 1, center[1]))
+                            currs.append((center[0] - 1, center[1] - 1))
+                        elif (center[0], center[1] + 1) in currs and (center[0] - 1, center[1] + 1) in currs:
+                            # rotatios is 4. will be 1
+                            currs = list()
+                            currs.append((center[0] + 1, center[1] + 1))
+                            currs.append((center[0], center[1] - 1))
+                            currs.append((center[0], center[1] + 1))
+                        else:
+                            raise StupidCoderError
+                    elif self.figure == 4:
+                        if not ((center[0], center[1] - 1) in currs):
+                            # rotation is 1. will be 2
+                            currs = list()
+                            # currs.append((center[0] + 1, center[1]))
+                            currs.append((center[0] - 1, center[1]))
+                            currs.append((center[0], center[1] + 1))
+                            currs.append((center[0], center[1] - 1))
+                        elif not ((center[0] + 1, center[1]) in currs):
+                            # rotation is 2. will be 3
+                            currs = list()
+                            currs.append((center[0] + 1, center[1]))
+                            currs.append((center[0] - 1, center[1]))
+                            # currs.append((center[0], center[1] + 1))
+                            currs.append((center[0], center[1] - 1))
+                        elif not ((center[0], center[1] + 1) in currs):
+                            # rotation is 3. will be 4
+                            currs = list()
+                            currs.append((center[0] + 1, center[1]))
+                            # currs.append((center[0] - 1, center[1]))
+                            currs.append((center[0], center[1] + 1))
+                            currs.append((center[0], center[1] - 1))
+                        elif not ((center[0] - 1, center[1]) in currs):
+                            # rotation is 4. will be 1
+                            currs = list()
+                            currs.append((center[0] + 1, center[1]))
+                            currs.append((center[0] - 1, center[1]))
+                            # currs.append((center[0], center[1] + 1))
+                            currs.append((center[0], center[1] + 1))
+                        else:
+                            raise StupidCoderError
+                    elif self.figure == 5:
+                        if (center[0] - 1, center[1]) in currs and (center[0] - 1, center[1] + 1) in currs:
+                            # rotation is 1. will be 2
+                            currs = list()
+                            currs.append((center[0] - 1, center[1]))
+                            currs.append((center[0], center[1] + 1))
+                            currs.append((center[0] + 1, center[1] + 1))
+                        elif (center[0], center[1] + 1) in currs and (center[0] + 1, center[1] + 1) in currs:
+                            # rotation is 2. will be 1
+                            currs = list()
+                            currs.append((center[0] - 1, center[1]))
+                            currs.append((center[0] - 1, center[1] - 1))
+                            currs.append((center[0], center[1] + 1))
+                        else:
+                            print(center)
+                    can_rotate = True
                     for elem in currs:
-                        self.board[elem[1]][elem[0]] = color
-        except Exception:
-            pass
+                        if not (0 < elem[1] < 19 and 0 < elem[0] < 9):
+                            can_rotate = False
+                        if self.board[elem[1]][elem[0]] != []:
+                            if self.board[elem[1]][elem[0]][0] == '_':
+                                can_rotate = False
+                    if can_rotate and self.figure != 2:
+                        for elem in old_currs:
+                            color = self.board[elem[1]][elem[0]]
+                            self.board[elem[1]][elem[0]] = []
+                        for elem in currs:
+                            self.board[elem[1]][elem[0]] = color
+            except Exception:
+                pass
 
     def catch(self, event):
         if event.key == 27:
@@ -270,7 +281,7 @@ class Tetris:
             for elem in self.check_full_lines():
                 self.score += 10
                 for i in range(elem, 0, -1):
-                    self.board[i] = self.board[i - 1]
+                    self.board[i] = copy.deepcopy(self.board)[i - 1]
 
     def new_curr(self):
         figure, self.next, x_pos = self.next, random.randrange(1, 6), random.randrange(0, 8)
@@ -297,6 +308,49 @@ class Tetris:
             self.hat[3][x_pos - 1] = color
             self.hat[3][x_pos] = color + "_"
         self.figure = figure
+
+    def draw_secondary(self):
+        if self.mode != "hard":
+            coords = list()
+            if self.next == 1:
+                coords.append((1, 2))
+                coords.append((2, 2))
+                coords.append((3, 2))
+                coords.append((4, 2))
+            elif self.next == 2:
+                coords.append((2, 2))
+                coords.append((2, 3))
+                coords.append((3, 2))
+                coords.append((3, 3))
+            elif self.next == 3:
+                coords.append((1, 2))
+                coords.append((2, 2))
+                coords.append((3, 2))
+                coords.append((3, 3))
+            elif self.next == 4:
+                coords.append((2, 2))
+                coords.append((3, 2))
+                coords.append((4, 2))
+                coords.append((3, 3))
+            elif self.next == 5:
+                coords.append((2, 2))
+                coords.append((3, 2))
+                coords.append((3, 3))
+                coords.append((4, 3))
+            sprites = pygame.sprite.Group()
+            for i in range(6):
+                for j in range(6):
+                    pygame.draw.rect(self.surface, (255, 255, 255),
+                                     (self.pos[0] + 350 + 35 * j, self.pos[1] + 35 * i, 35, 35), width=1)
+                    if (i, j) in coords:
+                        sprite = pygame.sprite.Sprite()
+                        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                                         "cube_-1.png")
+                        sprite.rect = sprite.image.get_rect()
+                        sprite.rect.x = self.pos[0] + 350 + 35 * j
+                        sprite.rect.y = self.pos[1] + 35 * i
+                        sprites.add(sprite)
+            sprites.draw(self.surface)
 
     def draw_self(self):
         sprites = pygame.sprite.Group()
@@ -336,5 +390,6 @@ class Tetris:
             sprite1.rect.x = self.pos[0] + 60
             sprite1.rect.y = self.pos[1] + 490
             sprites.add(sprite1)
+        self.draw_secondary()
         sprites.draw(self.surface)
         self.draw_score()

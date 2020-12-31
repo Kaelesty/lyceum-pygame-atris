@@ -26,6 +26,16 @@ class MenuPainter:
         sprite.rect.x = 200
         sprite.rect.y = 320
         self.buttons.add(sprite)
+        sprite = Button('normal', "st", self.buttons)
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 200
+        sprite.rect.y = 360
+        self.buttons.add(sprite)
+        sprite = Button('hard', "st", self.buttons)
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 200
+        sprite.rect.y = 400
+        self.buttons.add(sprite)
         self.buttons.draw(self.surface)
 
     def init_classic(self, mode):
