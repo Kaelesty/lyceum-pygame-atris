@@ -93,6 +93,8 @@ if __name__ == '__main__':
                             mp.tetris = 0
                             mp.init_selector()
                             fps = 30
+                elif main_status == "ig-bt":
+                    mp.btris.catch(event)
             elif event.type == pygame.MOUSEBUTTONUP:
                 if main_status == "ig-bt":
                     if following_bt:
