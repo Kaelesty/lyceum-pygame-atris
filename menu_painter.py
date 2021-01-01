@@ -2,6 +2,7 @@ import pygame
 import random
 from button import Button
 from tetris import Tetris
+from btris import Btris
 
 
 class MenuPainter:
@@ -23,20 +24,28 @@ class MenuPainter:
         self.buttons = pygame.sprite.Group()
         sprite = Button('classic', "st", self.buttons)
         sprite.rect = sprite.image.get_rect()
-        sprite.rect.x = 200
+        sprite.rect.x = 167
         sprite.rect.y = 320
         self.buttons.add(sprite)
+
         sprite = Button('normal', "st", self.buttons)
         sprite.rect = sprite.image.get_rect()
-        sprite.rect.x = 200
+        sprite.rect.x = 167
         sprite.rect.y = 360
         self.buttons.add(sprite)
+
         sprite = Button('hard', "st", self.buttons)
         sprite.rect = sprite.image.get_rect()
-        sprite.rect.x = 200
+        sprite.rect.x = 167
         sprite.rect.y = 400
         self.buttons.add(sprite)
         self.buttons.draw(self.surface)
+
+        sprite = Button('btris_20', "st", self.buttons)
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 567
+        sprite.rect.y = 400
+        self.buttons.add(sprite)
 
     def init_classic(self, mode):
         if mode == "classic":
@@ -44,6 +53,9 @@ class MenuPainter:
         self.buttons = pygame.sprite.Group()
         self.tetris = Tetris(self.surface, mode, (465, 0))
         self.tetris.new_curr()
+
+    def init_btris(self, size):
+        self.btris = Btris(self.surface, size, (10, 10))
 
     def upload_buttons(self, buttons):
         self.buttons = buttons
@@ -125,6 +137,7 @@ class MenuPainter:
         sprite.rect.x = 0
         sprite.rect.y = 0
         decorations.add(sprite)
+        # Tetris Decorations
         sprite = pygame.sprite.Sprite()
         sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
                                          "tetris_border.png")
@@ -137,6 +150,21 @@ class MenuPainter:
                                          "tetris_st.png")
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 120
+        sprite.rect.y = 110
+        decorations.add(sprite)
+        # Btris Decorations
+        sprite = pygame.sprite.Sprite()
+        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                         "btris_border.png")
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 450
+        sprite.rect.y = 50
+        decorations.add(sprite)
+        sprite = pygame.sprite.Sprite()
+        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                         "btris_logo.png")
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 520
         sprite.rect.y = 110
         decorations.add(sprite)
         decorations.draw(self.surface)

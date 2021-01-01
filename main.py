@@ -7,6 +7,7 @@ from menu_painter import MenuPainter
 # wfa - wait for activity
 # gmc - game mode choosing
 # ig-cl - in game classic
+# ig-bt - in game btris
 
 def check_click(x_pos, y_pos, x_left, y_top, width, height):
     if x_left <= x_pos <= x_left + width:
@@ -29,6 +30,9 @@ def button_reaction(name):
     if name == "hard":
         main_status = 'ig-cl'
         mp.init_classic(name)
+    if name == "btris_20":
+        main_status = 'ig-bt'
+        mp.init_btris(name[-2:])
 
 
 if __name__ == '__main__':
@@ -41,6 +45,7 @@ if __name__ == '__main__':
     pygame.display.set_caption('Atris - Main')
     main_status = 'wfa'
     mp = MenuPainter(screen)
+    following_bt = False
     while running:
         screen.fill((0, 0, 0))
         if main_status == 'omm':
@@ -52,6 +57,10 @@ if __name__ == '__main__':
         elif main_status == 'ig-cl':
             mp.draw_and_step()
             fps = 5
+        elif main_status == "ig-bt":
+            mp.btris.draw_self()
+            if following_bt:
+                mp.btris.update(pygame.mouse.get_pos())
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -70,6 +79,9 @@ if __name__ == '__main__':
                     for elem in group:
                         sprites.add(elem)
                     mp.buttons = sprites
+                elif main_status == "ig-bt":
+                    if mp.btris.catch_mbd(event.pos):
+                        following_bt = True
             elif event.type == pygame.KEYDOWN:
                 if main_status == "ig-cl":
                     if event.key != 120:
@@ -80,22 +92,28 @@ if __name__ == '__main__':
                             main_status = "gmc"
                             mp.tetris = 0
                             mp.init_selector()
+                            fps = 30
             elif event.type == pygame.MOUSEBUTTONUP:
-                try:
-                    group = list(mp.buttons)
-                except TypeError:
-                    break
-                for i in range(len(list(mp.buttons))):
-                    if group[i].stat == 'ps':
-                        if group[i].rect.collidepoint(event.pos):
-                            group[i].change_stat('st')
-                            button_reaction(group[i].name)
-                        else:
-                            group[i].change_stat('st')
-                            sprites = pygame.sprite.Group()
-                            for elem in group:
-                                sprites.add(elem)
-                            mp.buttons = sprites
+                if main_status == "ig-bt":
+                    if following_bt:
+                        mp.btris.catch_mbu(event.pos)
+                        following_bt = False
+                else:
+                    try:
+                        group = list(mp.buttons)
+                    except TypeError:
+                        break
+                    for i in range(len(list(mp.buttons))):
+                        if group[i].stat == 'ps':
+                            if group[i].rect.collidepoint(event.pos):
+                                group[i].change_stat('st')
+                                button_reaction(group[i].name)
+                            else:
+                                group[i].change_stat('st')
+                                sprites = pygame.sprite.Group()
+                                for elem in group:
+                                    sprites.add(elem)
+                                mp.buttons = sprites
             else:
                 if mp.buttons != False and main_status in ['omm', 'gmc']:
                     group = list(mp.buttons)
