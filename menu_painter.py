@@ -3,6 +3,7 @@ import random
 from button import Button
 from tetris import Tetris
 from btris import Btris
+from welltris import Welltris
 
 
 class MenuPainter:
@@ -59,6 +60,12 @@ class MenuPainter:
         sprite.rect.y = 320
         self.buttons.add(sprite)
 
+        sprite = Button('_easy', "st", self.buttons)
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 967
+        sprite.rect.y = 320
+        self.buttons.add(sprite)
+
     def init_classic(self, mode):
         if mode == "classic":
             mode = "easy"
@@ -68,6 +75,9 @@ class MenuPainter:
 
     def init_btris(self, size):
         self.btris = Btris(self.surface, size, (10, 10))
+
+    def init_welltris(self, mode):
+        self.welltris = Welltris(self.surface, mode, (10, 10))
 
     def upload_buttons(self, buttons):
         self.buttons = buttons
@@ -162,7 +172,7 @@ class MenuPainter:
                                          "tetris_st.png")
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 120
-        sprite.rect.y = 110
+        sprite.rect.y = 130
         decorations.add(sprite)
         # Btris Decorations
         sprite = pygame.sprite.Sprite()
@@ -177,11 +187,30 @@ class MenuPainter:
                                          "btris_logo.png")
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 520
-        sprite.rect.y = 110
+        sprite.rect.y = 130
         decorations.add(sprite)
+        # Welltris Decorations
+        sprite = pygame.sprite.Sprite()
+        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                         "welltris_border.png")
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 850
+        sprite.rect.y = 50
+        decorations.add(sprite)
+        sprite = pygame.sprite.Sprite()
+        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                         "welltris_st.png")
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 930
+        sprite.rect.y = 130
+        decorations.add(sprite)
+
         decorations.draw(self.surface)
         self.buttons.draw(self.surface)
 
     def draw_and_step(self):
         self.tetris.make_step()
         self.tetris.draw_self()
+
+    def draw_and_step_w(self):
+        self.welltris.draw_self()

@@ -8,6 +8,7 @@ from menu_painter import MenuPainter
 # gmc - game mode choosing
 # ig-cl - in game classic
 # ig-bt - in game btris
+# ig-wt - in game welltris
 
 def check_click(x_pos, y_pos, x_left, y_top, width, height):
     if x_left <= x_pos <= x_left + width:
@@ -39,6 +40,9 @@ def button_reaction(name):
     elif name == "btris_5":
         main_status = 'ig-bt'
         mp.init_btris(5)
+    elif name == "_easy":
+        main_status = "ig-wt"
+        mp.init_welltris("easy")
 
 
 if __name__ == '__main__':
@@ -67,6 +71,8 @@ if __name__ == '__main__':
             mp.btris.draw_self()
             if following_bt:
                 mp.btris.update(pygame.mouse.get_pos())
+        elif main_status == "ig-wt":
+            mp.draw_and_step_w()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False

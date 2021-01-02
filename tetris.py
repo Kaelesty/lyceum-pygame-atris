@@ -26,7 +26,6 @@ class Tetris:
         self.surface = screen
         self.board = [[[]] * 10 for _ in range(20)]
         self.hat = [[[]] * 10 for _ in range(6)]
-        self.next = False
         self.mode = mode
         self.pos = pos
         self.game = 1
