@@ -21,18 +21,24 @@ def button_reaction(name):
     if name == 'play':
         main_status = 'gmc'
         mp.init_selector()
-    if name == 'classic':
+    elif name == 'classic':
         main_status = 'ig-cl'
         mp.init_classic(name)
-    if name == "normal":
+    elif name == "normal":
         main_status = 'ig-cl'
         mp.init_classic(name)
-    if name == "hard":
+    elif name == "hard":
         main_status = 'ig-cl'
         mp.init_classic(name)
-    if name == "btris_20":
+    elif name == "btris_20":
         main_status = 'ig-bt'
-        mp.init_btris(name[-2:])
+        mp.init_btris(20)
+    elif name == "btris_10":
+        main_status = 'ig-bt'
+        mp.init_btris(10)
+    elif name == "btris_5":
+        main_status = 'ig-bt'
+        mp.init_btris(5)
 
 
 if __name__ == '__main__':
@@ -94,7 +100,14 @@ if __name__ == '__main__':
                             mp.init_selector()
                             fps = 30
                 elif main_status == "ig-bt":
-                    mp.btris.catch(event)
+                    if event.key != 120:
+                        mp.btris.catch(event)
+                    else:
+                        mp.btris.terminate()
+                        main_status = "gmc"
+                        mp.btris = 0
+                        mp.init_selector()
+                        fps = 30
             elif event.type == pygame.MOUSEBUTTONUP:
                 if main_status == "ig-bt":
                     if following_bt:

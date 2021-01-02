@@ -47,6 +47,18 @@ class MenuPainter:
         sprite.rect.y = 400
         self.buttons.add(sprite)
 
+        sprite = Button('btris_10', "st", self.buttons)
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 567
+        sprite.rect.y = 360
+        self.buttons.add(sprite)
+
+        sprite = Button('btris_5', "st", self.buttons)
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 567
+        sprite.rect.y = 320
+        self.buttons.add(sprite)
+
     def init_classic(self, mode):
         if mode == "classic":
             mode = "easy"

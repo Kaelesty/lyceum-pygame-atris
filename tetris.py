@@ -359,7 +359,7 @@ class Tetris:
                 if True:
                     pygame.draw.rect(self.surface, (255, 190, 15),
                                      (self.pos[0] + 35 * j, self.pos[1] + 35 * i, 35, 35), width=1)
-                    if self.board[i][j] != []:
+                    if self.board[i][j]:
                         sprite = pygame.sprite.Sprite()
                         if self.board[i][j][0] == "_" and self.board[i][j][-1] == "_":
                             color = self.board[i][j][1:-1]
