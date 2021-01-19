@@ -52,7 +52,7 @@ if __name__ == '__main__':
     size = width, height = 1280, 720
     screen = pygame.display.set_mode(size)
     running = True
-    pygame.display.set_caption('Atris - Main')
+    pygame.display.set_caption('Atris')
     main_status = 'wfa'
     mp = MenuPainter(screen)
     following_bt = False
@@ -73,6 +73,7 @@ if __name__ == '__main__':
                 mp.btris.update(pygame.mouse.get_pos())
         elif main_status == "ig-wt":
             mp.draw_and_step_w()
+            fps = 5
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -114,6 +115,8 @@ if __name__ == '__main__':
                         mp.btris = 0
                         mp.init_selector()
                         fps = 30
+                elif main_status == "ig-wt":
+                    mp.welltris.catch(event)
             elif event.type == pygame.MOUSEBUTTONUP:
                 if main_status == "ig-bt":
                     if following_bt:
