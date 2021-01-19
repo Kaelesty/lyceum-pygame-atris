@@ -213,4 +213,5 @@ class MenuPainter:
         self.tetris.draw_self()
 
     def draw_and_step_w(self):
+        self.welltris.make_step()
         self.welltris.draw_self()
