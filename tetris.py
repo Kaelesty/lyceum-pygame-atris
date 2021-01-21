@@ -15,6 +15,8 @@ import sqlite3
 # 4 - cross
 # 5 - z
 
+WIDTH = 1
+
 
 class StupidCoderError(Exception):
     def __init__(self):
@@ -226,15 +228,21 @@ class Tetris:
                         self.hat[elem[1]][elem[0]], self.hat[elem[1]][elem[0] + move] = [], self.hat[elem[1]][elem[0]]
 
     def draw_score(self):
-        font = pygame.font.Font(None, 50)
-        text = font.render(str(self.score), True, (255, 255, 255))
-        text_x = 1000
-        text_y = 50
+        pygame.draw.rect(self.surface, (255, 190, 15),
+                         (self.pos[0] + 350, self.pos[1] + 310, 320, 100), width=WIDTH)
+        font = pygame.font.Font("Data\ "[0:-1] + "Konstanting.ttf", 50)
+        text = font.render("Score:", True, (255, 190, 15))
+        text_x = self.pos[0] + 350
+        text_y = self.pos[1] + 310
         text_w = text.get_width()
         text_h = text.get_height()
         self.surface.blit(text, (text_x, text_y))
-        pygame.draw.rect(self.surface, (0, 255, 0), (text_x - 10, text_y - 10,
-                                                     text_w + 20, text_h + 20), 1)
+        text = font.render(str(self.score), True, (255, 190, 15))
+        text_x = self.pos[0] + 350
+        text_y = self.pos[1] + 350
+        text_w = text.get_width()
+        text_h = text.get_height()
+        self.surface.blit(text, (text_x, text_y))
 
     def make_step(self):
         if self.game == 1:
@@ -377,18 +385,37 @@ class Tetris:
         if self.game == 0:
             sprite1 = pygame.sprite.Sprite()
             sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
-                                              "paused.png")
-            sprite1.rect = sprite.image.get_rect()
-            sprite1.rect.x = self.pos[0] + 25
-            sprite1.rect.y = self.pos[1] + 415
-            sprites.add(sprite1)
-            sprite1 = pygame.sprite.Sprite()
-            sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
                                               "press_x.png")
             sprite1.rect = sprite.image.get_rect()
             sprite1.rect.x = self.pos[0] + 60
             sprite1.rect.y = self.pos[1] + 490
             sprites.add(sprite1)
+        pygame.draw.rect(self.surface, (255, 190, 15),
+                         (self.pos[0] + 350, self.pos[1] + 210, 320, 100), width=WIDTH)
+        sprite1 = pygame.sprite.Sprite()
+        sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                          "status.png")
+        sprite1.rect = sprite1.image.get_rect()
+        sprite1.rect.x = self.pos[0] + 350
+        sprite1.rect.y = self.pos[1] + 215
+        sprites.add(sprite1)
+        if self.game == 0:
+            sprite1 = pygame.sprite.Sprite()
+            sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                              "paused.png")
+            sprite1.rect = sprite1.image.get_rect()
+            sprite1.rect.x = self.pos[0] + 360
+            sprite1.rect.y = self.pos[1] + 215
+            sprites.add(sprite1)
+        else:
+            sprite1 = pygame.sprite.Sprite()
+            sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                              "gim.png")
+            sprite1.rect = sprite1.image.get_rect()
+            sprite1.rect.x = self.pos[0] + 360
+            sprite1.rect.y = self.pos[1] + 215
+            sprites.add(sprite1)
+        sprites.draw(self.surface)
         self.draw_secondary()
         sprites.draw(self.surface)
         self.draw_score()
