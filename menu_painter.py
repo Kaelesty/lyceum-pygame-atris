@@ -18,6 +18,19 @@ class MenuPainter:
         sprite.rect.x = 50
         sprite.rect.y = 320
         self.buttons.add(sprite)
+
+        sprite = Button('notes', "st", self.buttons)
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 50
+        sprite.rect.y = 360
+        self.buttons.add(sprite)
+
+        sprite = Button('exit', "st", self.buttons)
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 50
+        sprite.rect.y = 400
+        self.buttons.add(sprite)
+
         self.buttons.draw(self.surface)
         self.falls = pygame.sprite.Group()
 
@@ -64,6 +77,18 @@ class MenuPainter:
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 967
         sprite.rect.y = 320
+        self.buttons.add(sprite)
+
+        sprite = Button('_normal', "st", self.buttons)
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 967
+        sprite.rect.y = 360
+        self.buttons.add(sprite)
+
+        sprite = Button('_hard', "st", self.buttons)
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 967
+        sprite.rect.y = 400
         self.buttons.add(sprite)
 
     def init_classic(self, mode):
