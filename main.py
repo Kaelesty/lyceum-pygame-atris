@@ -23,29 +23,66 @@ def button_reaction(name):
         main_status = 'gmc'
         mp.init_selector()
     elif name == 'classic':
+        pygame.mixer.init()
+        pygame.mixer.music.load("Data\ "[0:-1] + 'Music\ '[0:-1] + "tetris.mp3")
+        pygame.mixer.music.play(-1)
         main_status = 'ig-cl'
         mp.init_classic(name)
     elif name == "normal":
+        pygame.mixer.init()
+        pygame.mixer.music.load("Data\ "[0:-1] + 'Music\ '[0:-1] + "tetris.mp3")
+        pygame.mixer.music.play(-1)
         main_status = 'ig-cl'
         mp.init_classic(name)
     elif name == "hard":
+        pygame.mixer.init()
+        pygame.mixer.music.load("Data\ "[0:-1] + 'Music\ '[0:-1] + "tetris.mp3")
+        pygame.mixer.music.play(-1)
         main_status = 'ig-cl'
         mp.init_classic(name)
     elif name == "btris_20":
+        pygame.mixer.init()
+        pygame.mixer.music.load("Data\ "[0:-1] + 'Music\ '[0:-1] + "btris.wav")
+        pygame.mixer.music.play(-1)
         main_status = 'ig-bt'
         mp.init_btris(20)
     elif name == "btris_10":
+        pygame.mixer.init()
+        pygame.mixer.music.load("Data\ "[0:-1] + 'Music\ '[0:-1] + "btris.wav")
+        pygame.mixer.music.play(-1)
         main_status = 'ig-bt'
         mp.init_btris(10)
     elif name == "btris_5":
+        pygame.mixer.init()
+        pygame.mixer.music.load("Data\ "[0:-1] + 'Music\ '[0:-1] + "btris.wav")
+        pygame.mixer.music.play(-1)
         main_status = 'ig-bt'
         mp.init_btris(5)
     elif name == "_easy":
+        pygame.mixer.init()
+        pygame.mixer.music.load("Data\ "[0:-1] + 'Music\ '[0:-1] + "welltris.wav")
+        pygame.mixer.music.play(-1)
         main_status = "ig-wt"
         mp.init_welltris("easy")
+    elif name == "_normal":
+        pygame.mixer.init()
+        pygame.mixer.music.load("Data\ "[0:-1] + 'Music\ '[0:-1] + "welltris.wav")
+        pygame.mixer.music.play(-1)
+        main_status = "ig-wt"
+        mp.init_welltris("normal")
+    elif name == "_hard":
+        pygame.mixer.init()
+        pygame.mixer.music.load("Data\ "[0:-1] + 'Music\ '[0:-1] + "welltris.wav")
+        pygame.mixer.music.play(-1)
+        main_status = "ig-wt"
+        mp.init_welltris("hard")
 
 
 if __name__ == '__main__':
+    pygame.mixer.init()
+    pygame.mixer.music.load("Data\ "[0:-1] + 'Music\ '[0:-1] + "mt.wav")
+    pygame.mixer.music.play(-1)
+    sounds = []
     fps = 30
     clock = pygame.time.Clock()
     pygame.init()
@@ -73,7 +110,6 @@ if __name__ == '__main__':
                 mp.btris.update(pygame.mouse.get_pos())
         elif main_status == "ig-wt":
             mp.draw_and_step_w()
-            fps = 5
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -96,27 +132,55 @@ if __name__ == '__main__':
                     if mp.btris.catch_mbd(event.pos):
                         following_bt = True
             elif event.type == pygame.KEYDOWN:
-                if main_status == "ig-cl":
+                if main_status == "gmc" and event.key == 120:
+                    main_status = "omm"
+                    mp.init_main_menu()
+                    pygame.mixer.Sound("Data\ "[0:-1] + 'Music\ '[0:-1] + "death.wav").play()
+                elif main_status == 'omm' and event.key == 120:
+                    main_status = "wfa"
+                    mp.buttons = []
+                    pygame.mixer.Sound("Data\ "[0:-1] + 'Music\ '[0:-1] + "death.wav").play()
+                elif main_status == "wfa" and event.key == 120:
+                    running = False
+                    pygame.mixer.Sound("Data\ "[0:-1] + 'Music\ '[0:-1] + "death.wav").play()
+                elif main_status == "ig-cl":
                     if event.key != 120:
                         mp.tetris.catch(event)
                     else:
-                        if mp.tetris.game == 0:
-                            mp.tetris.terminate()
-                            main_status = "gmc"
-                            mp.tetris = 0
-                            mp.init_selector()
-                            fps = 30
+                        pygame.mixer.init()
+                        pygame.mixer.music.load("Data\ "[0:-1] + 'Music\ '[0:-1] + "mt.wav")
+                        pygame.mixer.music.play(-1)
+                        mp.tetris.terminate()
+                        pygame.mixer.Sound("Data\ "[0:-1] + 'Music\ '[0:-1] + "death.wav").play()
+                        main_status = "gmc"
+                        mp.tetris = 0
+                        mp.init_selector()
+                        fps = 30
                 elif main_status == "ig-bt":
                     if event.key != 120:
                         mp.btris.catch(event)
                     else:
+                        pygame.mixer.init()
+                        pygame.mixer.music.load("Data\ "[0:-1] + 'Music\ '[0:-1] + "mt.wav")
+                        pygame.mixer.music.play(-1)
+                        pygame.mixer.Sound("Data\ "[0:-1] + 'Music\ '[0:-1] + "death.wav").play()
                         mp.btris.terminate()
                         main_status = "gmc"
                         mp.btris = 0
                         mp.init_selector()
                         fps = 30
                 elif main_status == "ig-wt":
-                    mp.welltris.catch(event)
+                    if event.key != 120:
+                        mp.welltris.catch(event)
+                    else:
+                        pygame.mixer.init()
+                        pygame.mixer.music.load("Data\ "[0:-1] + 'Music\ '[0:-1] + "mt.wav")
+                        pygame.mixer.music.play(-1)
+                        mp.welltris.terminate()
+                        main_status = "gmc"
+                        mp.welltris = 0
+                        mp.init_selector()
+                        fps = 30
             elif event.type == pygame.MOUSEBUTTONUP:
                 if main_status == "ig-bt":
                     if following_bt:
@@ -130,6 +194,7 @@ if __name__ == '__main__':
                     for i in range(len(list(mp.buttons))):
                         if group[i].stat == 'ps':
                             if group[i].rect.collidepoint(event.pos):
+                                pygame.mixer.Sound("Data\ "[0:-1] + 'Music\ '[0:-1] + "bt_ps.wav").play()
                                 group[i].change_stat('st')
                                 button_reaction(group[i].name)
                             else:
