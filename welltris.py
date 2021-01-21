@@ -1,6 +1,8 @@
 import pygame
 import random
 import copy
+import sqlite3
+import datetime as dt
 
 OS = 1 / 0.8917795292374964
 OOS = 0.8917795292374964
@@ -38,6 +40,18 @@ class Welltris:
         self.next = random.randrange(1, 6)
         self.score = 0
         self.new_current()
+        self.pause = 0.9
+        self.begin = dt.datetime.now()
+
+    def terminate(self):
+        con = sqlite3.connect("Data\ "[0:-1] + "AData.sqlite")
+        cur = con.cursor()
+        data = cur.execute(f"SELECT _{self.mode} FROM Scores").fetchall()
+        if list(data)[0][0] < self.score:
+            cur.execute(f"UPDATE Scores SET _{self.mode} = {self.score}")
+        con.commit()
+        con.close()
+        # i will be back
 
     def new_current(self):
         self.current_wing = random.choice([1, 2, 3, 4])
@@ -68,8 +82,14 @@ class Welltris:
         self.figure = figure
 
     def make_step(self):
-        if self.game == 1:
+        self.check_fulls()
+        now = dt.datetime.now()
+        print(self.pause)
+        if self.game == 1 and (now - self.begin).total_seconds() >= self.pause:
             #  check wing possible
+            self.begin = now
+            if self.pause > 0:
+                self.pause -= 0.002
             _can = True
             points = []
             cpoints = []
@@ -111,9 +131,6 @@ class Welltris:
                 except Exception:
                     for elem in self.wings[0]:
                         print(elem)
-                    print(' ')
-                    print(i)
-                    print(j)
                 if self.current_wing == 1:
                     x_move = 0
                     y_move = 1
@@ -173,6 +190,33 @@ class Welltris:
                 for elem in cpoints:
                     self.wings[0][elem[0]][elem[1]] = "_" + elem[2]
                 self.new_current()
+            list(map(lambda x: x[0], self.wings[self.current_wing][i]))
+
+    def check_fulls(self):
+        if self.wings[self.current_wing] != [['0'] * 8 for _ in range(8)]:
+            for i in range(8):
+                if list(map(lambda x: x[0], self.wings[self.current_wing][i])) == ["_"] * 8:
+                    del self.wings[self.current_wing][i]
+                    self.wings[self.current_wing].insert(0, ["0"] * 8)
+                    self.score += 8
+        if self.wings[0] != [["0"] * 8 for _ in range(8)]:
+            fulls = []
+            for i in range(8):
+                if list(map(lambda x: x[0], self.wings[0][i])) == ["_"] * 8:
+                    del self.wings[0][i]
+                    self.wings[0].insert(0, ["0"] * 8)
+                    self.score += 8
+                _full = True
+                for j in range(8):
+                    if self.wings[0][j][i][0] != "_":
+                        _full = False
+                if _full:
+                    fulls.append(i)
+            for i in fulls:
+                for j in range(8):
+                    self.wings[0][j][i] = ["0"] * 8
+
+
 
     def game_over(self):
         pass
@@ -183,9 +227,32 @@ class Welltris:
                 self.game = 1
             else:
                 self.game = 0
-        elif event.key == 97:
-            #  check wing possible
+        elif event.key == 97 and (self.game == 1 or self.mode == "easy"):
             _can = True
+            cpoints = []
+            if self.current_wing == 1:
+                x_move = -1
+                y_move = 0
+            elif self.current_wing == 2:
+                x_move = 0
+                y_move = -1
+            elif self.current_wing == 3:
+                x_move = 1
+                y_move = 0
+            elif self.current_wing == 4:
+                x_move = 0
+                y_move = 1
+            for i in range(8):
+                for j in range(8):
+                    if self.wings[0][i][j] != '0' and self.wings[0][i][j][0] != '_':
+                        cpoints.append((i, j, self.wings[0][i][j]))
+            for elem in cpoints:
+                if not 0 <= elem[0] + y_move <= 7 or not 0 <= elem[1] + x_move <= 7:
+                    _can = False
+                else:
+                    if self.wings[0][elem[0] + y_move][elem[1] + x_move][0] == '_':
+                        _can = False
+            #  check wing possible
             points = []
             for i in range(8):
                 for j in range(8):
@@ -209,6 +276,11 @@ class Welltris:
                         if self.wings[self.current_wing][0][elem[1]][0] == '_':
                             _can = False
             if _can:
+                for elem in cpoints:
+                    self.wings[0][elem[0]][elem[1]] = '0'
+                cpoints = sorted(cpoints, key=lambda x: -int(x[1]))
+                for elem in cpoints:
+                    self.wings[0][elem[0] + y_move][elem[1] + x_move] = elem[2]
                 for elem in points:
                     self.wings[self.current_wing][elem[0]][elem[1]] = '0'
                 points = sorted(points, key=lambda x: -int(x[1]))
@@ -222,9 +294,32 @@ class Welltris:
                         self.hat[elem[0]][elem[1] - 1] = elem[2]
                     else:
                         self.wings[self.current_wing][0][elem[1]] = elem[2]
-        elif event.key == 100:
-            #  check wing possible
+        elif event.key == 100 and (self.game == 1 or self.mode == "easy"):
             _can = True
+            cpoints = []
+            if self.current_wing == 1:
+                x_move = 1
+                y_move = 0
+            elif self.current_wing == 2:
+                x_move = 0
+                y_move = 1
+            elif self.current_wing == 3:
+                x_move = -1
+                y_move = 0
+            elif self.current_wing == 4:
+                x_move = 0
+                y_move = -1
+            for i in range(8):
+                for j in range(8):
+                    if self.wings[0][i][j] != '0' and self.wings[0][i][j][0] != '_':
+                        cpoints.append((i, j, self.wings[0][i][j]))
+            for elem in cpoints:
+                if (not elem[0] + y_move in [i for i in range(8)]) or (not elem[1] + x_move in [i for i in range(8)]):
+                    _can = False
+                else:
+                    if self.wings[0][elem[0] + y_move][elem[1] + x_move][0] == '_':
+                        _can = False
+            #  check wing possible
             points = []
             for i in range(8):
                 for j in range(8):
@@ -248,6 +343,11 @@ class Welltris:
                         if self.wings[self.current_wing][0][elem[1]][0] == '_':
                             _can = False
             if _can:
+                for elem in cpoints:
+                    self.wings[0][elem[0]][elem[1]] = '0'
+                cpoints = sorted(cpoints, key=lambda x: -int(x[1]))
+                for elem in cpoints:
+                    self.wings[0][elem[0] + y_move][elem[1] + x_move] = elem[2]
                 for elem in points:
                     self.wings[self.current_wing][elem[0]][elem[1]] = '0'
                 points = sorted(points, key=lambda x: -int(x[1]))
@@ -261,7 +361,7 @@ class Welltris:
                         self.hat[elem[0]][elem[1] + 1] = elem[2]
                     else:
                         self.wings[self.current_wing][0][elem[1]] = elem[2]
-        elif event.key == 32:
+        elif event.key == 32 and (self.game == 1 or self.mode == "easy"):
             try:
                 # rotation
                 c_points = []
@@ -375,6 +475,95 @@ class Welltris:
         self.draw_bottom()
         self.draw_left()
         self.draw_right()
+        self.draw_score()
+        self.draw_secondary()
+        pygame.draw.rect(self.surface, (255, 190, 15),
+                         (self.pos[0] + 700, self.pos[1], 320, 100), width=WIDTH)
+        sprites = pygame.sprite.Group()
+        sprite1 = pygame.sprite.Sprite()
+        sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                          "status.png")
+        sprite1.rect = sprite1.image.get_rect()
+        sprite1.rect.x = self.pos[0] + 710
+        sprite1.rect.y = self.pos[1] + 5
+        sprites.add(sprite1)
+        if self.game == 0:
+            sprite1 = pygame.sprite.Sprite()
+            sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                              "paused.png")
+            sprite1.rect = sprite1.image.get_rect()
+            sprite1.rect.x = self.pos[0] + 710
+            sprite1.rect.y = self.pos[1] + 25
+            sprites.add(sprite1)
+        else:
+            sprite1 = pygame.sprite.Sprite()
+            sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                              "gim.png")
+            sprite1.rect = sprite1.image.get_rect()
+            sprite1.rect.x = self.pos[0] + 710
+            sprite1.rect.y = self.pos[1] + 25
+            sprites.add(sprite1)
+        sprites.draw(self.surface)
+
+    def draw_secondary(self):
+        if self.mode != "hard":
+            coords = list()
+            if self.next == 1:
+                coords.append((1, 2))
+                coords.append((2, 2))
+                coords.append((3, 2))
+                coords.append((4, 2))
+            elif self.next == 2:
+                coords.append((2, 2))
+                coords.append((2, 3))
+                coords.append((3, 2))
+                coords.append((3, 3))
+            elif self.next == 3:
+                coords.append((1, 2))
+                coords.append((2, 2))
+                coords.append((3, 2))
+                coords.append((3, 3))
+            elif self.next == 4:
+                coords.append((2, 2))
+                coords.append((3, 2))
+                coords.append((4, 2))
+                coords.append((3, 3))
+            elif self.next == 5:
+                coords.append((2, 2))
+                coords.append((3, 2))
+                coords.append((3, 3))
+                coords.append((4, 3))
+            sprites = pygame.sprite.Group()
+            for i in range(6):
+                for j in range(6):
+                    pygame.draw.rect(self.surface, (255, 190, 15),
+                                     (self.pos[0] + 700 + 35 * j, self.pos[1] + 200 + 35 * i, 35, 35), width=1)
+                    if (i, j) in coords:
+                        sprite = pygame.sprite.Sprite()
+                        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                                         "cube_-1.png")
+                        sprite.rect = sprite.image.get_rect()
+                        sprite.rect.x = self.pos[0] + 700 + 35 * j
+                        sprite.rect.y = self.pos[1] + 200 + 35 * i
+                        sprites.add(sprite)
+            sprites.draw(self.surface)
+
+    def draw_score(self):
+        pygame.draw.rect(self.surface, (255, 190, 15),
+                         (self.pos[0] + 700, self.pos[1] + 100, 320, 100), width=WIDTH)
+        font = pygame.font.Font("Data\ "[0:-1] + "Konstanting.ttf", 50)
+        text = font.render("Score:", True, (255, 190, 15))
+        text_x = self.pos[0] + 710
+        text_y = self.pos[1] + 110
+        text_w = text.get_width()
+        text_h = text.get_height()
+        self.surface.blit(text, (text_x, text_y))
+        text = font.render(str(self.score), True, (255, 190, 15))
+        text_x = self.pos[0] + 710
+        text_y = self.pos[1] + 150
+        text_w = text.get_width()
+        text_h = text.get_height()
+        self.surface.blit(text, (text_x, text_y))
 
     def draw_center(self):
         for i in range(8):
