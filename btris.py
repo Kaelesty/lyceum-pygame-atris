@@ -108,7 +108,7 @@ class Btris:
                         coords.append((j, i + 1))
                 can_set = True
                 for elem in coords:
-                    if 0 <= elem[1] < 20 and 0 <= elem[0] < 20:
+                    if 0 <= elem[1] < self.size and 0 <= elem[0] < self.size:
                         if self.board[elem[1]][elem[0]]:
                             can_set = False
                             break
@@ -132,7 +132,6 @@ class Btris:
 
     def catch(self, event):
         if event.key == 32 and self.following != 0:
-            print(self.figures[self.following - 1][2])
             if self.figures[self.following - 1][0] in (3, 4):
                 self.figures[self.following - 1][2] += 1
                 if self.figures[self.following - 1][2] == 5:
@@ -143,24 +142,21 @@ class Btris:
                     self.figures[self.following - 1][2] = 1
 
     def check_fulls(self):
-        for j in range(self.size):
-            if self.board[j] == [1] * self.size:
-                self.board[j] = [[]] * self.size
+        for i in range(self.size):
+            _full_hor = True
+            _full_vert = True
+            for j in range(self.size):
+                if not self.board[i][j]:
+                    _full_hor = False
+                if not self.board[j][i]:
+                    _full_vert = False
+            if _full_hor:
+                self.board[i] = [[]] * self.size
                 self.score += self.size
-            else:
-                flag = True
-                for i in range(self.size):
-                    if self.board[i][j] == 1:
-                        if self.board[i][j] != self.board[0][j]:
-                            flag = False
-                    else:
-                        flag = False
-                        break
-                if flag:
-                    self.score += self.size
-                    for i in range(self.size):
-                        self.board[i][j] = []
-
+            if _full_vert:
+                for j in range(self.size):
+                    self.board[j][i] = []
+                self.score += self.size
     def stop_following(self):
         self.figures[self.following - 1][1] = (self.pos[0] + 800 + 70, self.pos[1] + 105 + 245 * (self.following - 1))
         self.following = 0
