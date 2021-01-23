@@ -83,6 +83,7 @@ class Welltris:
 
     def make_step(self):
         self.check_fulls()
+        self.check_game_over()
         now = dt.datetime.now()
         print(self.pause)
         if self.game == 1 and (now - self.begin).total_seconds() >= self.pause:
@@ -216,10 +217,6 @@ class Welltris:
                 for j in range(8):
                     self.wings[0][j][i] = ["0"] * 8
 
-
-
-    def game_over(self):
-        pass
 
     def catch(self, event): # A - 97, D - 100, SPACE - 32
         if event.key == 27:
@@ -495,6 +492,14 @@ class Welltris:
             sprite1.rect.x = self.pos[0] + 710
             sprite1.rect.y = self.pos[1] + 25
             sprites.add(sprite1)
+        elif self.game == 2:
+            sprite1 = pygame.sprite.Sprite()
+            sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                              "game_over.png")
+            sprite1.rect = sprite1.image.get_rect()
+            sprite1.rect.x = self.pos[0] + 710
+            sprite1.rect.y = self.pos[1] + 25
+            sprites.add(sprite1)
         else:
             sprite1 = pygame.sprite.Sprite()
             sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
@@ -547,6 +552,12 @@ class Welltris:
                         sprite.rect.y = self.pos[1] + 200 + 35 * i
                         sprites.add(sprite)
             sprites.draw(self.surface)
+
+    def check_game_over(self):
+        for i in range(1, 5):
+            for j in range(8):
+                if self.wings[i][0][j][0] == "_":
+                    self.game = 2
 
     def draw_score(self):
         pygame.draw.rect(self.surface, (255, 190, 15),

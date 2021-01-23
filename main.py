@@ -9,6 +9,7 @@ from menu_painter import MenuPainter
 # ig-cl - in game classic
 # ig-bt - in game btris
 # ig-wt - in game welltris
+# nts - notes
 
 def check_click(x_pos, y_pos, x_left, y_top, width, height):
     if x_left <= x_pos <= x_left + width:
@@ -18,7 +19,7 @@ def check_click(x_pos, y_pos, x_left, y_top, width, height):
 
 
 def button_reaction(name):
-    global main_status, mp
+    global main_status, mp, running
     if name == 'play':
         main_status = 'gmc'
         mp.init_selector()
@@ -76,6 +77,10 @@ def button_reaction(name):
         pygame.mixer.music.play(-1)
         main_status = "ig-wt"
         mp.init_welltris("hard")
+    elif name == "exit":
+        running = False
+    elif name == "notes":
+        main_status = "nts"
 
 
 if __name__ == '__main__':
@@ -110,6 +115,8 @@ if __name__ == '__main__':
                 mp.btris.update(pygame.mouse.get_pos())
         elif main_status == "ig-wt":
             mp.draw_and_step_w()
+        elif main_status == "nts":
+            mp.draw_notes()
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -143,6 +150,8 @@ if __name__ == '__main__':
                 elif main_status == "wfa" and event.key == 120:
                     running = False
                     pygame.mixer.Sound("Data\ "[0:-1] + 'Music\ '[0:-1] + "death.wav").play()
+                elif main_status == "nts" and event.key == 120:
+                    main_status = "omm"
                 elif main_status == "ig-cl":
                     if event.key != 120:
                         mp.tetris.catch(event)

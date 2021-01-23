@@ -4,6 +4,7 @@ from button import Button
 from tetris import Tetris
 from btris import Btris
 from welltris import Welltris
+import sqlite3
 
 
 class MenuPainter:
@@ -39,56 +40,56 @@ class MenuPainter:
         sprite = Button('classic', "st", self.buttons)
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 167
-        sprite.rect.y = 320
+        sprite.rect.y = 220
         self.buttons.add(sprite)
 
         sprite = Button('normal', "st", self.buttons)
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 167
-        sprite.rect.y = 360
+        sprite.rect.y = 320
         self.buttons.add(sprite)
 
         sprite = Button('hard', "st", self.buttons)
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 167
-        sprite.rect.y = 400
+        sprite.rect.y = 420
         self.buttons.add(sprite)
         self.buttons.draw(self.surface)
 
         sprite = Button('btris_20', "st", self.buttons)
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 567
-        sprite.rect.y = 400
+        sprite.rect.y = 220
         self.buttons.add(sprite)
 
         sprite = Button('btris_10', "st", self.buttons)
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 567
-        sprite.rect.y = 360
+        sprite.rect.y = 320
         self.buttons.add(sprite)
 
         sprite = Button('btris_5', "st", self.buttons)
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 567
-        sprite.rect.y = 320
+        sprite.rect.y = 420
         self.buttons.add(sprite)
 
         sprite = Button('_easy', "st", self.buttons)
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 967
-        sprite.rect.y = 320
+        sprite.rect.y = 220
         self.buttons.add(sprite)
 
         sprite = Button('_normal', "st", self.buttons)
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 967
-        sprite.rect.y = 360
+        sprite.rect.y = 320
         self.buttons.add(sprite)
 
         sprite = Button('_hard', "st", self.buttons)
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 967
-        sprite.rect.y = 400
+        sprite.rect.y = 420
         self.buttons.add(sprite)
 
     def init_classic(self, mode):
@@ -106,6 +107,17 @@ class MenuPainter:
 
     def upload_buttons(self, buttons):
         self.buttons = buttons
+
+    def draw_notes(self):
+        notes = pygame.sprite.Group()
+        sprite = pygame.sprite.Sprite()
+        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                         "notes.png")
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 0
+        sprite.rect.y = 0
+        notes.add(sprite)
+        notes.draw(self.surface)
 
     def draw_waiting(self):
         self.surface.fill((30, 30, 30))
@@ -232,6 +244,103 @@ class MenuPainter:
 
         decorations.draw(self.surface)
         self.buttons.draw(self.surface)
+        self.draw_results()
+
+    def draw_results(self):
+        con = sqlite3.connect("Data\ "[0:-1] + "AData.sqlite")
+        cur = con.cursor()
+        font = pygame.font.Font("Data\ "[0:-1] + "Konstanting.ttf", 30)
+
+        data = cur.execute(f"SELECT Classic_easy FROM Scores").fetchall()[0][0]
+        text = font.render("Best:", True, (255, 190, 15))
+        text_x = 167
+        text_y = 250
+        self.surface.blit(text, (text_x, text_y))
+        text = font.render(str(data), True, (255, 190, 15))
+        text_x = 220
+        text_y = 250
+        self.surface.blit(text, (text_x, text_y))
+
+        data = cur.execute(f"SELECT Classic_normal FROM Scores").fetchall()[0][0]
+        text = font.render("Best:", True, (255, 190, 15))
+        text_x = 167
+        text_y = 350
+        self.surface.blit(text, (text_x, text_y))
+        text = font.render(str(data), True, (255, 190, 15))
+        text_x = 220
+        text_y = 350
+        self.surface.blit(text, (text_x, text_y))
+
+        data = cur.execute(f"SELECT Classic_hard FROM Scores").fetchall()[0][0]
+        text = font.render("Best:", True, (255, 190, 15))
+        text_x = 167
+        text_y = 450
+        self.surface.blit(text, (text_x, text_y))
+        text = font.render(str(data), True, (255, 190, 15))
+        text_x = 220
+        text_y = 450
+        self.surface.blit(text, (text_x, text_y))
+
+        data = cur.execute(f"SELECT Btris_20 FROM Scores").fetchall()[0][0]
+        text = font.render("Best:", True, (255, 190, 15))
+        text_x = 567
+        text_y = 250
+        self.surface.blit(text, (text_x, text_y))
+        text = font.render(str(data), True, (255, 190, 15))
+        text_x = 620
+        text_y = 250
+        self.surface.blit(text, (text_x, text_y))
+
+        data = cur.execute(f"SELECT Btris_10 FROM Scores").fetchall()[0][0]
+        text = font.render("Best:", True, (255, 190, 15))
+        text_x = 567
+        text_y = 350
+        self.surface.blit(text, (text_x, text_y))
+        text = font.render(str(data), True, (255, 190, 15))
+        text_x = 620
+        text_y = 350
+        self.surface.blit(text, (text_x, text_y))
+
+        data = cur.execute(f"SELECT Btris_5 FROM Scores").fetchall()[0][0]
+        text = font.render("Best:", True, (255, 190, 15))
+        text_x = 567
+        text_y = 450
+        self.surface.blit(text, (text_x, text_y))
+        text = font.render(str(data), True, (255, 190, 15))
+        text_x = 620
+        text_y = 450
+        self.surface.blit(text, (text_x, text_y))
+
+        data = cur.execute(f"SELECT _easy FROM Scores").fetchall()[0][0]
+        text = font.render("Best:", True, (255, 190, 15))
+        text_x = 967
+        text_y = 250
+        self.surface.blit(text, (text_x, text_y))
+        text = font.render(str(data), True, (255, 190, 15))
+        text_x = 1020
+        text_y = 250
+        self.surface.blit(text, (text_x, text_y))
+
+        data = cur.execute(f"SELECT _normal FROM Scores").fetchall()[0][0]
+        text = font.render("Best:", True, (255, 190, 15))
+        text_x = 967
+        text_y = 350
+        self.surface.blit(text, (text_x, text_y))
+        text = font.render(str(data), True, (255, 190, 15))
+        text_x = 1020
+        text_y = 350
+        self.surface.blit(text, (text_x, text_y))
+
+        data = cur.execute(f"SELECT _hard FROM Scores").fetchall()[0][0]
+        text = font.render("Best:", True, (255, 190, 15))
+        text_x = 967
+        text_y = 450
+        self.surface.blit(text, (text_x, text_y))
+        text = font.render(str(data), True, (255, 190, 15))
+        text_x = 1020
+        text_y = 450
+        self.surface.blit(text, (text_x, text_y))
+
 
     def draw_and_step(self):
         self.tetris.make_step()

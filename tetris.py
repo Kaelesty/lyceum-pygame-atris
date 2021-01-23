@@ -39,9 +39,6 @@ class Tetris:
         con = sqlite3.connect("Data\ "[0:-1] + "AData.sqlite")
         cur = con.cursor()
         data = cur.execute(f"SELECT Classic_{self.mode} FROM Scores").fetchall()
-        print(list(data)[0][0])
-        print(self.score)
-        print(f"UPDATE Scores SET Classic_{self.mode} = {self.score}")
         if list(data)[0][0] < self.score:
             cur.execute(f"UPDATE Scores SET Classic_{self.mode} = {self.score}")
         con.commit()
@@ -244,7 +241,14 @@ class Tetris:
         text_h = text.get_height()
         self.surface.blit(text, (text_x, text_y))
 
+    def check_game_over(self):
+        for i in range(8):
+            if self.board[0][i] != []:
+                if self.board[0][i][0] == "_":
+                    self.game = 2
+
     def make_step(self):
+        self.check_game_over()
         if self.game == 1:
             can_do_step = True
             unstatic_blocks = []
@@ -403,6 +407,14 @@ class Tetris:
             sprite1 = pygame.sprite.Sprite()
             sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
                                               "paused.png")
+            sprite1.rect = sprite1.image.get_rect()
+            sprite1.rect.x = self.pos[0] + 360
+            sprite1.rect.y = self.pos[1] + 215
+            sprites.add(sprite1)
+        elif self.game == 2:
+            sprite1 = pygame.sprite.Sprite()
+            sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                              "game_over.png")
             sprite1.rect = sprite1.image.get_rect()
             sprite1.rect.x = self.pos[0] + 360
             sprite1.rect.y = self.pos[1] + 215

@@ -10,6 +10,8 @@ import sqlite3
 # 4 - cross
 # 5 - z
 
+WIDTH = 5
+
 
 class Bmino(pygame.sprite.Sprite):
     def __init__(self, color):
@@ -157,6 +159,7 @@ class Btris:
                 for j in range(self.size):
                     self.board[j][i] = []
                 self.score += self.size
+
     def stop_following(self):
         self.figures[self.following - 1][1] = (self.pos[0] + 800 + 70, self.pos[1] + 105 + 245 * (self.following - 1))
         self.following = 0
@@ -172,15 +175,19 @@ class Btris:
         # i will be back
 
     def draw_score(self):
-        font = pygame.font.Font(None, 50)
-        text = font.render(str(self.score), True, (255, 255, 255))
-        text_x = 1100
-        text_y = 20
+        font = pygame.font.Font("Data\ "[0:-1] + "Konstanting.ttf", 50)
+        text = font.render("Score:", True, (255, 190, 15))
+        text_x = self.pos[0] + 1110
+        text_y = self.pos[1]
         text_w = text.get_width()
         text_h = text.get_height()
         self.surface.blit(text, (text_x, text_y))
-        pygame.draw.rect(self.surface, (0, 255, 0), (text_x - 10, text_y - 10,
-                                                     text_w + 20, text_h + 20), 1)
+        text = font.render(str(self.score), True, (255, 190, 15))
+        text_x = self.pos[0] + 1110
+        text_y = self.pos[1] + 50
+        text_w = text.get_width()
+        text_h = text.get_height()
+        self.surface.blit(text, (text_x, text_y))
 
     def draw_self(self):
         blocks = pygame.sprite.Group()
