@@ -1,5 +1,6 @@
 import pygame
 from menu_painter import MenuPainter
+import sqlite3
 
 
 # game stats:
@@ -81,6 +82,20 @@ def button_reaction(name):
         running = False
     elif name == "notes":
         main_status = "nts"
+    elif name == "left":
+        change_volume(-0.02)
+    elif name == "right":
+        change_volume(0.02)
+
+def change_volume(value):
+    global volume
+    con = sqlite3.connect("Data\ "[0:-1] + "AData.sqlite")
+    cur = con.cursor()
+    volume = cur.execute("SELECT Volume FROM Settings").fetchall()[0][0]
+    if volume + value > 0:
+        cur.execute(f"UPDATE Settings SET Volume = {volume + value}")
+        con.commit()
+    con.close()
 
 
 if __name__ == '__main__':
@@ -99,6 +114,11 @@ if __name__ == '__main__':
     mp = MenuPainter(screen)
     following_bt = False
     while running:
+        con = sqlite3.connect("Data\ "[0:-1] + "AData.sqlite")
+        cur = con.cursor()
+        volume = cur.execute("SELECT Volume FROM Settings").fetchall()[0][0]
+        con.close()
+        pygame.mixer.music.set_volume(volume)
         screen.fill((0, 0, 0))
         if main_status == 'omm':
             mp.draw_main_menu()
@@ -203,8 +223,11 @@ if __name__ == '__main__':
                     for i in range(len(list(mp.buttons))):
                         if group[i].stat == 'ps':
                             if group[i].rect.collidepoint(event.pos):
-                                pygame.mixer.Sound("Data\ "[0:-1] + 'Music\ '[0:-1] + "bt_ps.wav").play()
-                                group[i].change_stat('st')
+                                if group[i].name != "right" and group[i].name != 'left':
+                                    sound = pygame.mixer.Sound("Data\ "[0:-1] + 'Music\ '[0:-1] + "bt_ps.wav")
+                                    sound.set_volume(volume + 0.02)
+                                    sound.play()
+                                group[i].change_stat('uw')
                                 button_reaction(group[i].name)
                             else:
                                 group[i].change_stat('st')

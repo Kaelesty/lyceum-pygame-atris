@@ -29,6 +29,18 @@ class MenuPainter:
         sprite = Button('exit', "st", self.buttons)
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 50
+        sprite.rect.y = 440
+        self.buttons.add(sprite)
+
+        sprite = Button('left', "st", self.buttons)
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 50
+        sprite.rect.y = 400
+        self.buttons.add(sprite)
+
+        sprite = Button('right', "st", self.buttons)
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 118 + 50
         sprite.rect.y = 400
         self.buttons.add(sprite)
 
@@ -159,6 +171,13 @@ class MenuPainter:
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 5
         sprite.rect.y = 5
+        atris.add(sprite)
+        sprite = pygame.sprite.Sprite(atris)
+        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                         "volume.png")
+        sprite.rect = sprite.image.get_rect()
+        sprite.rect.x = 83
+        sprite.rect.y = 400
         atris.add(sprite)
         atris.draw(self.surface)
         self.buttons.draw(self.surface)
