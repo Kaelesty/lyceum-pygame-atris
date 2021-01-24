@@ -36,6 +36,68 @@ class Btris:
         # figure: [form, (pos_x, pos_y), rotation#(2 for 1 and 5 forms;1 for 2 form;4 for 3 and 4 forms)#, color]
         self.following = 0
         self.score = 0
+        self.particles_target = (self.pos[0] + 1120, self.pos[1] + 10)
+        self.particles = pygame.sprite.Group()
+        self.particles_spawn = 0
+
+    def generate_particles(self, height=-1, longtude=-1):
+        self.particles_spawn = 100
+        for i in range(self.size):
+            sprite = pygame.sprite.Sprite()
+            sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                              "particle.png")
+            sprite.rect = sprite.image.get_rect()
+            if height != -1:
+                sprite.rect.x = self.pos[0] + 15 + 35 * i
+                sprite.rect.y = self.pos[1] + 15 + 35 * height
+            else:
+                sprite.rect.x = self.pos[0] + 15 + 35 * longtude
+                sprite.rect.y = self.pos[1] + 15 + 35 * i
+            self.particles.add(sprite)
+
+    def update_particles(self):
+        new_particles = []
+        if self.particles_spawn < -200:
+            for elem in list(self.particles):
+                self.score += 1
+            self.particles = pygame.sprite.Group()
+        else:
+            for elem in list(self.particles):
+                self.particles_spawn -= 1
+                if self.particles_spawn <= 0:
+                    _add = True
+                    if elem.rect.x > self.particles_target[0]:
+                        elem.rect.x -= 16
+                        if elem.rect.x < self.particles_target[0]:
+                            self.score += 1
+                            _add = False
+                    elif elem.rect.x < self.particles_target[0]:
+                        elem.rect.x += 16
+                        if elem.rect.x > self.particles_target[0]:
+                            self.score += 1
+                            _add = False
+                    if elem.rect.y > self.particles_target[1]:
+                        elem.rect.y -= 2
+                        if elem.rect.y < self.particles_target[1]:
+                            self.score += 1
+                            _add = False
+                    elif elem.rect.y < self.particles_target[1]:
+                        elem.rect.y += 2
+                        if elem.rect.y > self.particles_target[1]:
+                            self.score += 1
+                            _add = False
+                    if _add:
+                        new_particles.append(elem)
+                else:
+                    elem.rect.x += random.randrange(-2, 2)
+                    elem.rect.y += random.randrange(-2, 2)
+                    new_particles.append(elem)
+            self.particles = pygame.sprite.Group()
+            for elem in new_particles:
+                if (elem.rect.x, elem.rect.y) != self.particles_target:
+                    self.particles.add(elem)
+                else:
+                    self.score += 1
 
     def update(self, pos):
         if self.following != 0:
@@ -154,11 +216,11 @@ class Btris:
                     _full_vert = False
             if _full_hor:
                 self.board[i] = [[]] * self.size
-                self.score += self.size
+                self.generate_particles(height=i)
             if _full_vert:
                 for j in range(self.size):
                     self.board[j][i] = []
-                self.score += self.size
+                self.generate_particles(longtude=i)
 
     def stop_following(self):
         self.figures[self.following - 1][1] = (self.pos[0] + 800 + 70, self.pos[1] + 105 + 245 * (self.following - 1))
@@ -216,6 +278,7 @@ class Btris:
         sprite1.rect.y = self.pos[1] + 675
         sprites.add(sprite1)
         sprites.draw(self.surface)
+        self.particles.draw(self.surface)
 
     def draw_fields(self):
         for i in range(6):

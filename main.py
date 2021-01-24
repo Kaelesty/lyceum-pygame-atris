@@ -101,6 +101,11 @@ def change_volume(value):
 if __name__ == '__main__':
     pygame.mixer.init()
     pygame.mixer.music.load("Data\ "[0:-1] + 'Music\ '[0:-1] + "mt.wav")
+    con = sqlite3.connect("Data\ "[0:-1] + "AData.sqlite")
+    cur = con.cursor()
+    volume = cur.execute("SELECT Volume FROM Settings").fetchall()[0][0]
+    con.close()
+    pygame.mixer.music.set_volume(volume)
     pygame.mixer.music.play(-1)
     sounds = []
     fps = 30
@@ -128,8 +133,8 @@ if __name__ == '__main__':
             mp.draw_selector()
         elif main_status == 'ig-cl':
             mp.draw_and_step()
-            fps = 5
         elif main_status == "ig-bt":
+            mp.btris.update_particles()
             mp.btris.draw_self()
             if following_bt:
                 mp.btris.update(pygame.mouse.get_pos())
@@ -184,7 +189,6 @@ if __name__ == '__main__':
                         main_status = "gmc"
                         mp.tetris = 0
                         mp.init_selector()
-                        fps = 30
                 elif main_status == "ig-bt":
                     if event.key != 120:
                         mp.btris.catch(event)
@@ -197,7 +201,6 @@ if __name__ == '__main__':
                         main_status = "gmc"
                         mp.btris = 0
                         mp.init_selector()
-                        fps = 30
                 elif main_status == "ig-wt":
                     if event.key != 120:
                         mp.welltris.catch(event)
@@ -209,7 +212,6 @@ if __name__ == '__main__':
                         main_status = "gmc"
                         mp.welltris = 0
                         mp.init_selector()
-                        fps = 30
             elif event.type == pygame.MOUSEBUTTONUP:
                 if main_status == "ig-bt":
                     if following_bt:

@@ -85,7 +85,6 @@ class Welltris:
         self.check_fulls()
         self.check_game_over()
         now = dt.datetime.now()
-        print(self.pause)
         if self.game == 1 and (now - self.begin).total_seconds() >= self.pause:
             #  check wing possible
             self.begin = now

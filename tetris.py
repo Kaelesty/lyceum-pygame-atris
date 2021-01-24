@@ -2,6 +2,7 @@ import pygame
 import random
 import copy
 import sqlite3
+import datetime as dt
 
 # GAME MODES:
 # easy : показывается след. фигура, можно вращать фигуры на паузе
@@ -18,6 +19,7 @@ import sqlite3
 WIDTH = 1
 
 
+
 class StupidCoderError(Exception):
     def __init__(self):
         pass
@@ -27,6 +29,7 @@ class Tetris:
     def __init__(self, screen, mode, pos):
         self.surface = screen
         self.board = [[[]] * 10 for _ in range(20)]
+        self.board[19] = ["_2"] * 10
         self.hat = [[[]] * 10 for _ in range(6)]
         self.mode = mode
         self.pos = pos
@@ -34,6 +37,11 @@ class Tetris:
         self.next = random.randrange(1, 6)
         self.score = 0
         self.secondary_pos = (self.pos[0] + 350, self.pos[1])
+        self.pause = 0.9
+        self.begin = dt.datetime.now()
+        self.particles = pygame.sprite.Group()
+        self.particles_target = (self.pos[0] + 350 + 160, self.pos[1] + 310 + 50)
+        self.particles_spawn = 0
 
     def terminate(self):
         con = sqlite3.connect("Data\ "[0:-1] + "AData.sqlite")
@@ -247,9 +255,66 @@ class Tetris:
                 if self.board[0][i][0] == "_":
                     self.game = 2
 
+
+    def generate_particles(self, height):
+        self.particles_spawn = 100
+        for i in range(10):
+            sprite = pygame.sprite.Sprite()
+            sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                                              "particle.png")
+            sprite.rect = sprite.image.get_rect()
+            sprite.rect.x = self.pos[0] + 15 + 35 * i
+            sprite.rect.y = self.pos[1] + 15 + 35 * height
+            self.particles.add(sprite)
+
+    def update_particles(self):
+        new_particles = []
+        for elem in list(self.particles):
+            if self.particles_spawn <= 0:
+                _add = True
+                if elem.rect.x > self.particles_target[0]:
+                    elem.rect.x -= 8
+                    if elem.rect.x < self.particles_target[0]:
+                        self.score += 1
+                        _add = False
+                elif elem.rect.x < self.particles_target[0]:
+                    elem.rect.x += 8
+                    if elem.rect.x > self.particles_target[0]:
+                        self.score += 1
+                        _add = False
+                if elem.rect.y > self.particles_target[1]:
+                    elem.rect.y -= 8
+                    if elem.rect.y < self.particles_target[1]:
+                        self.score += 1
+                        _add = False
+                elif elem.rect.y < self.particles_target[1]:
+                    elem.rect.y += 8
+                    if elem.rect.y > self.particles_target[1]:
+                        self.score += 1
+                        _add = False
+                if _add:
+                    new_particles.append(elem)
+            else:
+                self.particles_spawn -= 1
+                elem.rect.x += random.randrange(-2, 2)
+                elem.rect.y += random.randrange(-2, 2)
+                new_particles.append(elem)
+        self.particles = pygame.sprite.Group()
+        for elem in new_particles:
+            if (elem.rect.x, elem.rect.y) != self.particles_target:
+                self.particles.add(elem)
+            else:
+                self.score += 1
+
+
     def make_step(self):
+        now = dt.datetime.now()
         self.check_game_over()
-        if self.game == 1:
+        self.update_particles()
+        if self.game == 1 and (now - self.begin).total_seconds() >= self.pause:
+            self.begin = now
+            if self.pause > 0:
+                self.pause -= 0.002
             can_do_step = True
             unstatic_blocks = []
             for i in range(20):
@@ -290,7 +355,7 @@ class Tetris:
             for elem in unstatic_blocks:
                 self.hat[elem[1]][elem[0]], self.hat[elem[1] + 1][elem[0]] = [], self.hat[elem[1]][elem[0]]
             for elem in self.check_full_lines():
-                self.score += 10
+                self.generate_particles(elem)
                 for i in range(elem, 0, -1):
                     self.board[i] = copy.deepcopy(self.board)[i - 1]
 
@@ -431,3 +496,4 @@ class Tetris:
         self.draw_secondary()
         sprites.draw(self.surface)
         self.draw_score()
+        self.particles.draw(self.surface)
