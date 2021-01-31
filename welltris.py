@@ -42,9 +42,11 @@ class Welltris:
         self.new_current()
         self.pause = 0.9
         self.begin = dt.datetime.now()
+        self.current_wing = random.randrange(1, 4)
+        self.figure = random.randrange(1, 6)
 
     def terminate(self):
-        con = sqlite3.connect("Data\ "[0:-1] + "AData.sqlite")
+        con = sqlite3.connect("Data\\" + "AData.sqlite")
         cur = con.cursor()
         data = cur.execute(f"SELECT _{self.mode} FROM Scores").fetchall()
         if list(data)[0][0] < self.score:
@@ -81,11 +83,11 @@ class Welltris:
             self.hat[0][x - 1] = color
         self.figure = figure
 
-    def make_step(self):
+    def make_step(self, skipper=False):
         self.check_fulls()
         self.check_game_over()
         now = dt.datetime.now()
-        if self.game == 1 and (now - self.begin).total_seconds() >= self.pause:
+        if self.game == 1 and ((now - self.begin).total_seconds() >= self.pause or skipper):
             #  check wing possible
             self.begin = now
             if self.pause > 0:
@@ -128,9 +130,10 @@ class Welltris:
                         for j in range(8):
                             if self.wings[0][i][j] != "0" and self.wings[0][i][j][0] != '_':
                                 cpoints.append((i, j,  self.wings[0][i][j]))
-                except Exception:
-                    for elem in self.wings[0]:
-                        print(elem)
+                except IndexError:
+                    pass
+                x_move = 0
+                y_move = 0
                 if self.current_wing == 1:
                     x_move = 0
                     y_move = 1
@@ -185,12 +188,13 @@ class Welltris:
                         self.wings[self.current_wing][0][elem[1]] = elem[2]
             else:
                 for elem in points:
-                    self.wings[self.current_wing][elem[0]][elem[1]] = '_' + self.wings[self.current_wing][elem[0]][elem[1]]
+                    self.wings[self.current_wing][elem[0]][elem[1]] = \
+                        '_' + self.wings[self.current_wing][elem[0]][elem[1]]
                 self.hat = [["0"] * 8 for _ in range(5)]
                 for elem in cpoints:
                     self.wings[0][elem[0]][elem[1]] = "_" + elem[2]
                 self.new_current()
-            list(map(lambda x: x[0], self.wings[self.current_wing][i]))
+                return True
 
     def check_fulls(self):
         if self.wings[self.current_wing] != [['0'] * 8 for _ in range(8)]:
@@ -216,14 +220,16 @@ class Welltris:
                 for j in range(8):
                     self.wings[0][j][i] = ["0"] * 8
 
-
-    def catch(self, event): # A - 97, D - 100, SPACE - 32
+    def catch(self, event):  # A - 97, D - 100, SPACE - 32
         if event.key == 27:
             if self.game == 0:
                 self.game = 1
             else:
                 self.game = 0
-        elif event.key == 97 and (self.game == 1 or self.mode == "easy"):
+        elif event.key == 115:
+            while not self.make_step(skipper=True):
+                pass
+        elif event.key == 97 and (self.game == 1 or self.mode == "easy") and self.hat == [["0"] * 8 for _ in range(5)]:
             _can = True
             cpoints = []
             if self.current_wing == 1:
@@ -290,7 +296,7 @@ class Welltris:
                         self.hat[elem[0]][elem[1] - 1] = elem[2]
                     else:
                         self.wings[self.current_wing][0][elem[1]] = elem[2]
-        elif event.key == 100 and (self.game == 1 or self.mode == "easy"):
+        elif event.key == 100 and (self.game == 1 or self.mode == "easy") and self.hat == [["0"] * 8 for _ in range(5)]:
             _can = True
             cpoints = []
             if self.current_wing == 1:
@@ -358,6 +364,8 @@ class Welltris:
                     else:
                         self.wings[self.current_wing][0][elem[1]] = elem[2]
         elif event.key == 32 and (self.game == 1 or self.mode == "easy"):
+            center = [0]
+            new_points = []
             try:
                 # rotation
                 c_points = []
@@ -369,10 +377,10 @@ class Welltris:
                                 c_points.append((i, j, self.wings[0][i][j]))
                             if not (self.wings[self.current_wing][i][j][0] in ["0", "_"]):
                                 w_points.append((i, j, self.wings[self.current_wing][i][j]))
-                    if c_points == []:
+                    if not c_points:
                         old_points = copy.deepcopy(w_points)
                         board_id = self.current_wing
-                    elif w_points == []:
+                    elif not w_points:
                         old_points = copy.deepcopy(c_points)
                         board_id = 0
                     else:
@@ -385,24 +393,16 @@ class Welltris:
                     # {figure detector}
                     if self.figure == 1:
                         if (center[0] - 1, center[1], center[2][:-1]) in old_points:  # now is vetrical
-                            new_points = list()
-                            new_points.append((center[0], center[1] - 1))
-                            new_points.append((center[0], center[1] + 1))
-                            new_points.append((center[0], center[1] + 2))
+                            new_points = [(center[0], center[1] - 1), (center[0], center[1] + 1),
+                                          (center[0], center[1] + 2)]
                         else:  # now is horizontal
-                            new_points = []
-                            new_points.append((center[0] - 1, center[1]))
-                            new_points.append((center[0] + 1, center[1]))
-                            new_points.append((center[0] + 2, center[1]))
+                            new_points = [(center[0] - 1, center[1]), (center[0] + 1, center[1]),
+                                          (center[0] + 2, center[1])]
                     elif self.figure == 3:
-                        if (center[0] - 1, center[1], center[2][:-1]) in old_points: # now is hori
-                            new_points = []
-                            new_points.append((center[0], center[1] - 1))
-                            new_points.append((center[0], center[1] + 1))
+                        if (center[0] - 1, center[1], center[2][:-1]) in old_points:  # now is hori
+                            new_points = [(center[0], center[1] - 1), (center[0], center[1] + 1)]
                         else:
-                            new_points = []
-                            new_points.append((center[0] - 1, center[1]))
-                            new_points.append((center[0] + 1, center[1]))
+                            new_points = [(center[0] - 1, center[1]), (center[0] + 1, center[1])]
                         if (center[0] + 1, center[1] + 1, center[2][:-1]) in old_points:
                             new_points.append((center[0] + 1, center[1] - 1))
                         elif (center[0] + 1, center[1] - 1, center[2][:-1]) in old_points:
@@ -412,11 +412,8 @@ class Welltris:
                         elif (center[0] - 1, center[1] + 1, center[2][:-1]) in old_points:
                             new_points.append((center[0] + 1, center[1] + 1))
                     elif self.figure == 4:
-                        new_points = []
-                        new_points.append((center[0] + 1, center[1]))
-                        new_points.append((center[0] - 1, center[1]))
-                        new_points.append((center[0], center[1] + 1))
-                        new_points.append((center[0], center[1] - 1))
+                        new_points = [(center[0] + 1, center[1]), (center[0] - 1, center[1]),
+                                      (center[0], center[1] + 1), (center[0], center[1] - 1)]
                         if not (center[0], center[1] - 1, center[2][:-1]) in old_points:
                             del new_points[1]
                         elif not (center[0] - 1, center[1], center[2][:-1]) in old_points:
@@ -426,41 +423,39 @@ class Welltris:
                         elif not (center[0] + 1, center[1], center[2][:-1]) in old_points:
                             del new_points[3]
                     elif self.figure == 5:
-                        if (center[0], center[1] - 1, center[2][:-1]) in old_points and (center[0] - 1, center[1] - 1, center[2][:-1]) in old_points:
-                            new_points = []
-                            new_points.append((center[0], center[1] - 1))
-                            new_points.append((center[0] - 1, center[1] + 1))
-                            new_points.append((center[0] - 1, center[1]))
-                        elif (center[0] + 1, center[1] + 1, center[2][:-1]) in old_points and (center[0] + 1, center[1], center[2][:-1]) in old_points:
-                            new_points = []
-                            new_points.append((center[0], center[1] - 1))
-                            new_points.append((center[0] - 1, center[1] - 1))
-                            new_points.append((center[0] + 1, center[1]))
-                        elif (center[0], center[1] + 1, center[2][:-1]) in old_points and (center[0] - 1, center[1] + 1, center[2][:-1]) in old_points:
-                            new_points = []
-                            new_points.append((center[0], center[1] - 1))
-                            new_points.append((center[0] + 1, center[1] + 1))
-                            new_points.append((center[0] + 1, center[1]))
-                        elif (center[0] - 1, center[1], center[2][:-1]) in old_points and (center[0] - 1, center[1] + 1, center[2][:-1]) in old_points:
-                            new_points = []
-                            new_points.append((center[0] - 1, center[1] + 1))
-                            new_points.append((center[0], center[1] + 1))
-                            new_points.append((center[0] + 1, center[1]))
-                    _can = True
-                    for elem in new_points:
-                        if self.wings[board_id][elem[0]][elem[1]][0] == "_" or not 0 <= elem[0] <= 7 or not 0 <= elem[1] <= 7:
-                            _can = False
-                    if _can:
-                        for i in range(3):
-                            self.wings[board_id][old_points[i][0]][old_points[i][1]] = '0'
-                        for i in range(3):
-                            self.wings[board_id][new_points[i][0]][new_points[i][1]] = old_points[i][2]
-                        self.wings[board_id][center[0]][center[1]] = center[2]
-                    else:
-                        raise Panic
+                        if (center[0], center[1] - 1, center[2][:-1]) in old_points and \
+                                (center[0] - 1, center[1] - 1, center[2][:-1]) in old_points:
+                            new_points = [(center[0], center[1] - 1), (center[0] - 1, center[1] + 1),
+                                          (center[0] - 1, center[1])]
+                        elif (center[0] + 1, center[1] + 1, center[2][:-1]) in old_points \
+                                and (center[0] + 1, center[1], center[2][:-1]) in old_points:
+                            new_points = [(center[0], center[1] - 1), (center[0] - 1, center[1] - 1),
+                                          (center[0] + 1, center[1])]
+                        elif (center[0], center[1] + 1, center[2][:-1]) in old_points \
+                                and (center[0] - 1, center[1] + 1, center[2][:-1]) in old_points:
+                            new_points = [(center[0], center[1] - 1), (center[0] + 1, center[1] + 1),
+                                          (center[0] + 1, center[1])]
+                        elif (center[0] - 1, center[1], center[2][:-1]) in old_points \
+                                and (center[0] - 1, center[1] + 1, center[2][:-1]) in old_points:
+                            new_points = [(center[0] - 1, center[1] + 1), (center[0], center[1] + 1),
+                                          (center[0] + 1, center[1])]
+                    if self.figure != 2:
+                        _can = True
+                        for elem in new_points:
+                            if self.wings[board_id][elem[0]][elem[1]][0] == "_" \
+                                    or not 0 <= elem[0] <= 7 or not 0 <= elem[1] <= 7:
+                                _can = False
+                        if _can:
+                            for i in range(3):
+                                self.wings[board_id][old_points[i][0]][old_points[i][1]] = '0'
+                            for i in range(3):
+                                self.wings[board_id][new_points[i][0]][new_points[i][1]] = old_points[i][2]
+                            self.wings[board_id][center[0]][center[1]] = center[2]
+                        else:
+                            raise Panic
                 else:
                     raise Panic
-            except Exception as ex:
+            except IndexError:
                 pass
 
     def draw_self(self):
@@ -477,7 +472,7 @@ class Welltris:
                          (self.pos[0] + 700, self.pos[1], 320, 100), width=WIDTH)
         sprites = pygame.sprite.Group()
         sprite1 = pygame.sprite.Sprite()
-        sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+        sprite1.image = pygame.image.load("Data\\" + "Sprites\\" +
                                           "status.png")
         sprite1.rect = sprite1.image.get_rect()
         sprite1.rect.x = self.pos[0] + 710
@@ -485,7 +480,7 @@ class Welltris:
         sprites.add(sprite1)
         if self.game == 0:
             sprite1 = pygame.sprite.Sprite()
-            sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+            sprite1.image = pygame.image.load("Data\\" + "Sprites\\" +
                                               "paused.png")
             sprite1.rect = sprite1.image.get_rect()
             sprite1.rect.x = self.pos[0] + 710
@@ -493,7 +488,7 @@ class Welltris:
             sprites.add(sprite1)
         elif self.game == 2:
             sprite1 = pygame.sprite.Sprite()
-            sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+            sprite1.image = pygame.image.load("Data\\" + "Sprites\\" +
                                               "game_over.png")
             sprite1.rect = sprite1.image.get_rect()
             sprite1.rect.x = self.pos[0] + 710
@@ -501,7 +496,7 @@ class Welltris:
             sprites.add(sprite1)
         else:
             sprite1 = pygame.sprite.Sprite()
-            sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+            sprite1.image = pygame.image.load("Data\\" + "Sprites\\" +
                                               "gim.png")
             sprite1.rect = sprite1.image.get_rect()
             sprite1.rect.x = self.pos[0] + 710
@@ -544,7 +539,7 @@ class Welltris:
                                      (self.pos[0] + 700 + 35 * j, self.pos[1] + 200 + 35 * i, 35, 35), width=1)
                     if (i, j) in coords:
                         sprite = pygame.sprite.Sprite()
-                        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                        sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
                                                          "cube_-1.png")
                         sprite.rect = sprite.image.get_rect()
                         sprite.rect.x = self.pos[0] + 700 + 35 * j
@@ -561,18 +556,14 @@ class Welltris:
     def draw_score(self):
         pygame.draw.rect(self.surface, (255, 190, 15),
                          (self.pos[0] + 700, self.pos[1] + 100, 320, 100), width=WIDTH)
-        font = pygame.font.Font("Data\ "[0:-1] + "Konstanting.ttf", 50)
+        font = pygame.font.Font("Data\\" + "Konstanting.ttf", 50)
         text = font.render("Score:", True, (255, 190, 15))
         text_x = self.pos[0] + 710
         text_y = self.pos[1] + 110
-        text_w = text.get_width()
-        text_h = text.get_height()
         self.surface.blit(text, (text_x, text_y))
         text = font.render(str(self.score), True, (255, 190, 15))
         text_x = self.pos[0] + 710
         text_y = self.pos[1] + 150
-        text_w = text.get_width()
-        text_h = text.get_height()
         self.surface.blit(text, (text_x, text_y))
 
     def draw_center(self):
@@ -604,8 +595,7 @@ class Welltris:
                     width = 0
                 else:
                     width = WIDTH
-                pygame.draw.polygon(self.surface, (255, 190, 15),
-                                   (point_1, point_2, point_3, point_4), width=width)
+                pygame.draw.polygon(self.surface, (255, 190, 15), (point_1, point_2, point_3, point_4), width=width)
 
     def draw_bottom(self):
         for i in range(8):
@@ -629,8 +619,7 @@ class Welltris:
                     width = 0
                 else:
                     width = WIDTH
-                pygame.draw.polygon(self.surface, (255, 190, 15),
-                                   (point_1, point_2, point_3, point_4), width=width)
+                pygame.draw.polygon(self.surface, (255, 190, 15), (point_1, point_2, point_3, point_4), width=width)
 
     def draw_right(self):
         for j in range(8):

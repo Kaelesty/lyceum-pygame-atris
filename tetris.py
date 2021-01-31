@@ -19,7 +19,6 @@ import datetime as dt
 WIDTH = 1
 
 
-
 class StupidCoderError(Exception):
     def __init__(self):
         pass
@@ -29,7 +28,6 @@ class Tetris:
     def __init__(self, screen, mode, pos):
         self.surface = screen
         self.board = [[[]] * 10 for _ in range(20)]
-        self.board[19] = ["_2"] * 10
         self.hat = [[[]] * 10 for _ in range(6)]
         self.mode = mode
         self.pos = pos
@@ -42,9 +40,10 @@ class Tetris:
         self.particles = pygame.sprite.Group()
         self.particles_target = (self.pos[0] + 350 + 160, self.pos[1] + 310 + 50)
         self.particles_spawn = 0
+        self.figure = 0
 
     def terminate(self):
-        con = sqlite3.connect("Data\ "[0:-1] + "AData.sqlite")
+        con = sqlite3.connect("Data\\" + "AData.sqlite")
         cur = con.cursor()
         data = cur.execute(f"SELECT Classic_{self.mode} FROM Scores").fetchall()
         if list(data)[0][0] < self.score:
@@ -58,7 +57,7 @@ class Tetris:
         for i in range(20):
             flag = True
             for j in range(10):
-                if self.board[i][j] != []:
+                if self.board[i][j]:
                     if self.board[i][j][0] != '_':
                         flag = False
                 else:
@@ -68,13 +67,15 @@ class Tetris:
         return returned
 
     def rotate(self):
+        center = 0
+        color = 0
         if self.game == 1 or self.mode == "classic":
             try:
                 if self.hat == [[[]] * 10 for _ in range(6)] and self.figure != 2:
                     currs = list()
                     for i in range(20):
                         for j in range(10):
-                            if self.board[i][j] != []:
+                            if self.board[i][j]:
                                 if self.board[i][j][0] != '_':
                                     if self.board[i][j][-1] != '_':
                                         currs.append((j, i))
@@ -172,7 +173,7 @@ class Tetris:
                     for elem in currs:
                         if not (0 < elem[1] < 19 and 0 < elem[0] < 9):
                             can_rotate = False
-                        if self.board[elem[1]][elem[0]] != []:
+                        if self.board[elem[1]][elem[0]]:
                             if self.board[elem[1]][elem[0]][0] == '_':
                                 can_rotate = False
                     if can_rotate and self.figure != 2:
@@ -181,7 +182,7 @@ class Tetris:
                             self.board[elem[1]][elem[0]] = []
                         for elem in currs:
                             self.board[elem[1]][elem[0]] = color
-            except Exception:
+            except IndexError:
                 pass
 
     def catch(self, event):
@@ -190,11 +191,15 @@ class Tetris:
                 self.game = 1
             else:
                 self.game = 0
+        elif event.key == 115:
+            while not self.make_step(skipper=True):
+                pass
         elif event.key == 32:
             self.rotate()
         elif event.key == 120:
             self.terminate()
         elif event.key in (97, 100):
+            move = 0
             if event.key == 97:
                 move = -1
             elif event.key == 100:
@@ -219,7 +224,7 @@ class Tetris:
                 unstatic_blocks_hat = []
                 for i in range(6):
                     for j in range(10):
-                        if self.hat[i][j] != []:
+                        if self.hat[i][j]:
                             if (j == 9 and move == 1) or (j == 0 and move == -1):
                                 can_do_step = False
                             else:
@@ -235,33 +240,27 @@ class Tetris:
     def draw_score(self):
         pygame.draw.rect(self.surface, (255, 190, 15),
                          (self.pos[0] + 350, self.pos[1] + 310, 320, 100), width=WIDTH)
-        font = pygame.font.Font("Data\ "[0:-1] + "Konstanting.ttf", 50)
+        font = pygame.font.Font("Data\\" + "Konstanting.ttf", 50)
         text = font.render("Score:", True, (255, 190, 15))
         text_x = self.pos[0] + 350
         text_y = self.pos[1] + 310
-        text_w = text.get_width()
-        text_h = text.get_height()
         self.surface.blit(text, (text_x, text_y))
         text = font.render(str(self.score), True, (255, 190, 15))
         text_x = self.pos[0] + 350
         text_y = self.pos[1] + 350
-        text_w = text.get_width()
-        text_h = text.get_height()
         self.surface.blit(text, (text_x, text_y))
 
     def check_game_over(self):
         for i in range(8):
-            if self.board[0][i] != []:
+            if self.board[0][i]:
                 if self.board[0][i][0] == "_":
                     self.game = 2
-
 
     def generate_particles(self, height):
         self.particles_spawn = 100
         for i in range(10):
             sprite = pygame.sprite.Sprite()
-            sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
-                                              "particle.png")
+            sprite.image = pygame.image.load("Data\\" + "Sprites\\" + "particle.png")
             sprite.rect = sprite.image.get_rect()
             sprite.rect.x = self.pos[0] + 15 + 35 * i
             sprite.rect.y = self.pos[1] + 15 + 35 * height
@@ -306,12 +305,11 @@ class Tetris:
             else:
                 self.score += 1
 
-
-    def make_step(self):
+    def make_step(self, skipper=False):
         now = dt.datetime.now()
         self.check_game_over()
         self.update_particles()
-        if self.game == 1 and (now - self.begin).total_seconds() >= self.pause:
+        if self.game == 1 and ((now - self.begin).total_seconds() >= self.pause or skipper):
             self.begin = now
             if self.pause > 0:
                 self.pause -= 0.002
@@ -319,7 +317,7 @@ class Tetris:
             unstatic_blocks = []
             for i in range(20):
                 for j in range(10):
-                    if self.board[i][j] != []:
+                    if self.board[i][j]:
                         if self.board[i][j][0] != "_":
                             if i == 19:
                                 can_do_step = False
@@ -331,17 +329,20 @@ class Tetris:
                                     pass
                             unstatic_blocks.append((j, i))
                 unstatic_blocks = sorted(unstatic_blocks, key=lambda x: -int(x[1]))
+            _return = False
             if can_do_step:
                 for elem in unstatic_blocks:
                     self.board[elem[1]][elem[0]], self.board[elem[1] + 1][elem[0]] = [], self.board[elem[1]][elem[0]]
             else:
                 for elem in unstatic_blocks:
                     self.board[elem[1]][elem[0]] = "_" + self.board[elem[1]][elem[0]]
+
                 self.new_curr()
+                _return = True
             unstatic_blocks = []
             for i in range(6):
                 for j in range(10):
-                    if self.hat[i][j] != []:
+                    if self.hat[i][j]:
                         if i != 5:
                             unstatic_blocks.append((j, i))
                         else:
@@ -358,31 +359,33 @@ class Tetris:
                 self.generate_particles(elem)
                 for i in range(elem, 0, -1):
                     self.board[i] = copy.deepcopy(self.board)[i - 1]
+            if _return:
+                return True
 
     def new_curr(self):
-        figure, self.next, x_pos = self.next, random.randrange(1, 6), random.randrange(0, 8)
+        figure, self.next, x_pos = self.next, random.randrange(1, 6), random.randrange(2, 8)
         color = random.choice(['1', '2', '3'])
-        self.hat[4][x_pos] = color
+        self.hat[4][int(x_pos)] = color
         if figure == 1:
-            self.hat[3][x_pos] = color
-            self.hat[2][x_pos] = color + '_'
-            self.hat[1][x_pos] = color
+            self.hat[3][int(x_pos)] = color
+            self.hat[2][int(x_pos)] = color + '_'
+            self.hat[1][int(x_pos)] = color
         elif figure == 2:
-            self.hat[3][x_pos] = color
-            self.hat[4][x_pos + 1] = color
-            self.hat[3][x_pos + 1] = color
+            self.hat[3][int(x_pos)] = color
+            self.hat[4][int(x_pos) + 1] = color
+            self.hat[3][int(x_pos) + 1] = color
         elif figure == 3:
-            self.hat[4][x_pos + 1] = color
-            self.hat[3][x_pos] = color + "_"
-            self.hat[2][x_pos] = color
+            self.hat[4][int(x_pos) + 1] = color
+            self.hat[3][int(x_pos)] = color + "_"
+            self.hat[2][int(x_pos)] = color
         elif figure == 4:
-            self.hat[3][x_pos] = color + "_"
-            self.hat[3][x_pos + 1] = color
-            self.hat[2][x_pos] = color
+            self.hat[3][int(x_pos)] = color + "_"
+            self.hat[3][int(x_pos) + 1] = color
+            self.hat[2][int(x_pos)] = color
         elif figure == 5:
-            self.hat[2][x_pos - 1] = color
-            self.hat[3][x_pos - 1] = color
-            self.hat[3][x_pos] = color + "_"
+            self.hat[2][int(x_pos) - 1] = color
+            self.hat[3][int(x_pos) - 1] = color
+            self.hat[3][int(x_pos)] = color + "_"
         self.figure = figure
 
     def draw_secondary(self):
@@ -420,7 +423,7 @@ class Tetris:
                                      (self.pos[0] + 350 + 35 * j, self.pos[1] + 35 * i, 35, 35), width=1)
                     if (i, j) in coords:
                         sprite = pygame.sprite.Sprite()
-                        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                        sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
                                                          "cube_-1.png")
                         sprite.rect = sprite.image.get_rect()
                         sprite.rect.x = self.pos[0] + 350 + 35 * j
@@ -445,7 +448,7 @@ class Tetris:
                             color = self.board[i][j][:-1]
                         else:
                             color = self.board[i][j]
-                        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                        sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
                                                          f"cube_{color}.png")
                         sprite.rect = sprite.image.get_rect()
                         sprite.rect.x = self.pos[0] + 35 * j
@@ -453,16 +456,16 @@ class Tetris:
                         sprites.add(sprite)
         if self.game == 0:
             sprite1 = pygame.sprite.Sprite()
-            sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+            sprite1.image = pygame.image.load("Data\\" + "Sprites\\" +
                                               "press_x.png")
-            sprite1.rect = sprite.image.get_rect()
+            sprite1.rect = sprite1.image.get_rect()
             sprite1.rect.x = self.pos[0] + 60
             sprite1.rect.y = self.pos[1] + 490
             sprites.add(sprite1)
         pygame.draw.rect(self.surface, (255, 190, 15),
                          (self.pos[0] + 350, self.pos[1] + 210, 320, 100), width=WIDTH)
         sprite1 = pygame.sprite.Sprite()
-        sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+        sprite1.image = pygame.image.load("Data\\" + "Sprites\\" +
                                           "status.png")
         sprite1.rect = sprite1.image.get_rect()
         sprite1.rect.x = self.pos[0] + 350
@@ -470,7 +473,7 @@ class Tetris:
         sprites.add(sprite1)
         if self.game == 0:
             sprite1 = pygame.sprite.Sprite()
-            sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+            sprite1.image = pygame.image.load("Data\\" + "Sprites\\" +
                                               "paused.png")
             sprite1.rect = sprite1.image.get_rect()
             sprite1.rect.x = self.pos[0] + 360
@@ -478,7 +481,7 @@ class Tetris:
             sprites.add(sprite1)
         elif self.game == 2:
             sprite1 = pygame.sprite.Sprite()
-            sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+            sprite1.image = pygame.image.load("Data\\" + "Sprites\\" +
                                               "game_over.png")
             sprite1.rect = sprite1.image.get_rect()
             sprite1.rect.x = self.pos[0] + 360
@@ -486,7 +489,7 @@ class Tetris:
             sprites.add(sprite1)
         else:
             sprite1 = pygame.sprite.Sprite()
-            sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+            sprite1.image = pygame.image.load("Data\\" + "Sprites\\" +
                                               "gim.png")
             sprite1.rect = sprite1.image.get_rect()
             sprite1.rect.x = self.pos[0] + 360

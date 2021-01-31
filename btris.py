@@ -2,7 +2,6 @@ import pygame
 import random
 import sqlite3
 
-
 # minos
 # 1 - line
 # 2 - cube
@@ -13,10 +12,10 @@ import sqlite3
 WIDTH = 5
 
 
-class Bmino(pygame.sprite.Sprite):
+class BDomino(pygame.sprite.Sprite):
     def __init__(self, color):
         super().__init__()
-        self.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+        self.image = pygame.image.load("Data\\" + "Sprites\\" +
                                        f"cube_{color}.png")
         self.rect = self.image.get_rect()
 
@@ -40,25 +39,25 @@ class Btris:
         self.particles = pygame.sprite.Group()
         self.particles_spawn = 0
 
-    def generate_particles(self, height=-1, longtude=-1):
+    def generate_particles(self, height=-1, longitude=-1):
         self.particles_spawn = 100
         for i in range(self.size):
             sprite = pygame.sprite.Sprite()
-            sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
-                                              "particle.png")
+            sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
+                                             "particle.png")
             sprite.rect = sprite.image.get_rect()
             if height != -1:
                 sprite.rect.x = self.pos[0] + 15 + 35 * i
                 sprite.rect.y = self.pos[1] + 15 + 35 * height
             else:
-                sprite.rect.x = self.pos[0] + 15 + 35 * longtude
+                sprite.rect.x = self.pos[0] + 15 + 35 * longitude
                 sprite.rect.y = self.pos[1] + 15 + 35 * i
             self.particles.add(sprite)
 
     def update_particles(self):
         new_particles = []
         if self.particles_spawn < -200:
-            for elem in list(self.particles):
+            for _ in list(self.particles):
                 self.score += 1
             self.particles = pygame.sprite.Group()
         else:
@@ -106,9 +105,9 @@ class Btris:
     def catch_mbu(self, pos):
         if self.pos[0] <= pos[0] <= self.pos[0] + 35 * self.size:
             if self.pos[1] <= pos[1] <= self.pos[1] + 35 * self.size:
-                coords = list()
+                coordinates = list()
                 i, j = pos[1] // 35, pos[0] // 35
-                coords.append((j, i))
+                coordinates.append((j, i))
                 if self.figures[self.following - 1][0] == 1:
                     if self.figures[self.following - 1][2] == 1:
                         x_move = 1
@@ -116,62 +115,62 @@ class Btris:
                     else:
                         x_move = 0
                         y_move = 1
-                    coords.append((j + x_move, i + y_move))
-                    coords.append((j + x_move * 2, i + y_move * 2))
-                    coords.append((j - x_move, i - y_move))
+                    coordinates.append((j + x_move, i + y_move))
+                    coordinates.append((j + x_move * 2, i + y_move * 2))
+                    coordinates.append((j - x_move, i - y_move))
                 elif self.figures[self.following - 1][0] == 2:
-                    coords.append((j + 1, i))
-                    coords.append((j + 1, i + 1))
-                    coords.append((j, i + 1))
+                    coordinates.append((j + 1, i))
+                    coordinates.append((j + 1, i + 1))
+                    coordinates.append((j, i + 1))
                 elif self.figures[self.following - 1][0] == 3:
                     if self.figures[self.following - 1][2] == 1:
-                        coords.append((j, i - 1))
-                        coords.append((j + 1, i - 1))
-                        coords.append((j, i + 1))
+                        coordinates.append((j, i - 1))
+                        coordinates.append((j + 1, i - 1))
+                        coordinates.append((j, i + 1))
                     elif self.figures[self.following - 1][2] == 2:
-                        coords.append((j - 1, i))
-                        coords.append((j + 1, i))
-                        coords.append((j + 1, i + 1))
+                        coordinates.append((j - 1, i))
+                        coordinates.append((j + 1, i))
+                        coordinates.append((j + 1, i + 1))
                     elif self.figures[self.following - 1][2] == 3:
-                        coords.append((j, i - 1))
-                        coords.append((j, i + 1))
-                        coords.append((j - 1, i + 1))
+                        coordinates.append((j, i - 1))
+                        coordinates.append((j, i + 1))
+                        coordinates.append((j - 1, i + 1))
                     elif self.figures[self.following - 1][2] == 4:
-                        coords.append((j - 1, i))
-                        coords.append((j + 1, i))
-                        coords.append((j - 1, i - 1))
+                        coordinates.append((j - 1, i))
+                        coordinates.append((j + 1, i))
+                        coordinates.append((j - 1, i - 1))
                 elif self.figures[self.following - 1][0] == 4:
                     if self.figures[self.following - 1][2] == 1:
-                        # coords.append((j, i - 1))
-                        coords.append((j, i + 1))
-                        coords.append((j + 1, i))
-                        coords.append((j - 1, i))
+                        # coordinates.append((j, i - 1))
+                        coordinates.append((j, i + 1))
+                        coordinates.append((j + 1, i))
+                        coordinates.append((j - 1, i))
                     elif self.figures[self.following - 1][2] == 2:
-                        coords.append((j, i - 1))
-                        coords.append((j, i + 1))
-                        # coords.append((j + 1, i))
-                        coords.append((j - 1, i))
+                        coordinates.append((j, i - 1))
+                        coordinates.append((j, i + 1))
+                        # coordinates.append((j + 1, i))
+                        coordinates.append((j - 1, i))
                     elif self.figures[self.following - 1][2] == 3:
-                        coords.append((j, i - 1))
-                        # coords.append((j, i + 1))
-                        coords.append((j + 1, i))
-                        coords.append((j - 1, i))
+                        coordinates.append((j, i - 1))
+                        # coordinates.append((j, i + 1))
+                        coordinates.append((j + 1, i))
+                        coordinates.append((j - 1, i))
                     elif self.figures[self.following - 1][2] == 4:
-                        coords.append((j, i - 1))
-                        coords.append((j, i + 1))
-                        coords.append((j + 1, i))
-                        # coords.append((j - 1, i))
+                        coordinates.append((j, i - 1))
+                        coordinates.append((j, i + 1))
+                        coordinates.append((j + 1, i))
+                        # coordinates.append((j - 1, i))
                 elif self.figures[self.following - 1][0] == 5:
                     if self.figures[self.following - 1][2] == 1:
-                        coords.append((j, i - 1))
-                        coords.append((j + 1, i - 1))
-                        coords.append((j - 1, i))
+                        coordinates.append((j, i - 1))
+                        coordinates.append((j + 1, i - 1))
+                        coordinates.append((j - 1, i))
                     else:
-                        coords.append((j - 1, i))
-                        coords.append((j - 1, i - 1))
-                        coords.append((j, i + 1))
+                        coordinates.append((j - 1, i))
+                        coordinates.append((j - 1, i - 1))
+                        coordinates.append((j, i + 1))
                 can_set = True
-                for elem in coords:
+                for elem in coordinates:
                     if 0 <= elem[1] < self.size and 0 <= elem[0] < self.size:
                         if self.board[elem[1]][elem[0]]:
                             can_set = False
@@ -180,7 +179,7 @@ class Btris:
                         can_set = False
                         break
                 if can_set:
-                    for elem in coords:
+                    for elem in coordinates:
                         self.board[elem[1]][elem[0]] = self.figures[self.following - 1][-1]
                     self.figures[self.following - 1] = [random.choice([1, 2, 3, 4, 5]),
                                                         (self.pos[0] + 800 + 70,
@@ -220,14 +219,14 @@ class Btris:
             if _full_vert:
                 for j in range(self.size):
                     self.board[j][i] = []
-                self.generate_particles(longtude=i)
+                self.generate_particles(longitude=i)
 
     def stop_following(self):
         self.figures[self.following - 1][1] = (self.pos[0] + 800 + 70, self.pos[1] + 105 + 245 * (self.following - 1))
         self.following = 0
 
     def terminate(self):
-        con = sqlite3.connect("Data\ "[0:-1] + "AData.sqlite")
+        con = sqlite3.connect("Data\\" + "AData.sqlite")
         cur = con.cursor()
         data = cur.execute(f"SELECT Btris_{self.size} FROM Scores").fetchall()
         if list(data)[0][0] < self.score:
@@ -237,18 +236,14 @@ class Btris:
         # i will be back
 
     def draw_score(self):
-        font = pygame.font.Font("Data\ "[0:-1] + "Konstanting.ttf", 50)
+        font = pygame.font.Font("Data\\" + "Konstanting.ttf", 50)
         text = font.render("Score:", True, (255, 190, 15))
         text_x = self.pos[0] + 1110
         text_y = self.pos[1]
-        text_w = text.get_width()
-        text_h = text.get_height()
         self.surface.blit(text, (text_x, text_y))
         text = font.render(str(self.score), True, (255, 190, 15))
         text_x = self.pos[0] + 1110
         text_y = self.pos[1] + 50
-        text_w = text.get_width()
-        text_h = text.get_height()
         self.surface.blit(text, (text_x, text_y))
 
     def draw_self(self):
@@ -259,7 +254,7 @@ class Btris:
                                  (self.pos[0] + 35 * j, self.pos[1] + 35 * i, 35, 35), width=1)
                 if self.board[i][j]:
                     sprite = pygame.sprite.Sprite()
-                    sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+                    sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
                                                      f"cube_{self.board[i][j]}.png")
                     sprite.rect = sprite.image.get_rect()
                     sprite.rect.x = self.pos[0] + 35 * j
@@ -271,7 +266,7 @@ class Btris:
         self.draw_score()
         sprites = pygame.sprite.Group()
         sprite1 = pygame.sprite.Sprite()
-        sprite1.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+        sprite1.image = pygame.image.load("Data\\" + "Sprites\\" +
                                           "press_x.png")
         sprite1.rect = sprite1.image.get_rect()
         sprite1.rect.x = self.pos[0] + 1030
@@ -302,189 +297,189 @@ class Btris:
                 else:
                     y_move = 35
                     x_move = 0
-                sprite1 = Bmino(self.figures[i][-1])
+                sprite1 = BDomino(self.figures[i][-1])
                 sprite1.rect.x = self.figures[i][1][0]
                 sprite1.rect.y = self.figures[i][1][1]
                 figures.add(sprite1)
-                sprite1 = Bmino(self.figures[i][-1])
+                sprite1 = BDomino(self.figures[i][-1])
                 sprite1.rect.x = self.figures[i][1][0] - x_move
                 sprite1.rect.y = self.figures[i][1][1] - y_move
                 figures.add(sprite1)
-                sprite1 = Bmino(self.figures[i][-1])
+                sprite1 = BDomino(self.figures[i][-1])
                 sprite1.rect.x = self.figures[i][1][0] + x_move
                 sprite1.rect.y = self.figures[i][1][1] + y_move
                 figures.add(sprite1)
-                sprite1 = Bmino(self.figures[i][-1])
+                sprite1 = BDomino(self.figures[i][-1])
                 sprite1.rect.x = self.figures[i][1][0] + x_move * 2
                 sprite1.rect.y = self.figures[i][1][1] + y_move * 2
                 figures.add(sprite1)
             elif self.figures[i][0] == 2:
-                sprite1 = Bmino(self.figures[i][-1])
+                sprite1 = BDomino(self.figures[i][-1])
                 sprite1.rect.x = self.figures[i][1][0]
                 sprite1.rect.y = self.figures[i][1][1]
                 figures.add(sprite1)
-                sprite1 = Bmino(self.figures[i][-1])
+                sprite1 = BDomino(self.figures[i][-1])
                 sprite1.rect.x = self.figures[i][1][0] + 35
                 sprite1.rect.y = self.figures[i][1][1]
                 figures.add(sprite1)
-                sprite1 = Bmino(self.figures[i][-1])
+                sprite1 = BDomino(self.figures[i][-1])
                 sprite1.rect.x = self.figures[i][1][0]
                 sprite1.rect.y = self.figures[i][1][1] + 35
                 figures.add(sprite1)
-                sprite1 = Bmino(self.figures[i][-1])
+                sprite1 = BDomino(self.figures[i][-1])
                 sprite1.rect.x = self.figures[i][1][0] + 35
                 sprite1.rect.y = self.figures[i][1][1] + 35
                 figures.add(sprite1)
             elif self.figures[i][0] == 3:
                 if self.figures[i][2] == 1:
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0]
                     sprite1.rect.y = self.figures[i][1][1]
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0]
                     sprite1.rect.y = self.figures[i][1][1] - 35
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0] + 35
                     sprite1.rect.y = self.figures[i][1][1] - 35
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0]
                     sprite1.rect.y = self.figures[i][1][1] + 35
                     figures.add(sprite1)
                 elif self.figures[i][2] == 2:
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0]
                     sprite1.rect.y = self.figures[i][1][1]
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0] - 35
                     sprite1.rect.y = self.figures[i][1][1]
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0] + 35
                     sprite1.rect.y = self.figures[i][1][1]
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0] + 35
                     sprite1.rect.y = self.figures[i][1][1] + 35
                     figures.add(sprite1)
                 elif self.figures[i][2] == 3:
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0]
                     sprite1.rect.y = self.figures[i][1][1]
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0]
                     sprite1.rect.y = self.figures[i][1][1] - 35
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0]
                     sprite1.rect.y = self.figures[i][1][1] + 35
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0] - 35
                     sprite1.rect.y = self.figures[i][1][1] + 35
                     figures.add(sprite1)
                 elif self.figures[i][2] == 4:
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0]
                     sprite1.rect.y = self.figures[i][1][1]
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0] + 35
                     sprite1.rect.y = self.figures[i][1][1]
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0] - 35
                     sprite1.rect.y = self.figures[i][1][1]
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0] - 35
                     sprite1.rect.y = self.figures[i][1][1] - 35
                     figures.add(sprite1)
             elif self.figures[i][0] == 4:
-                sprite1 = Bmino(self.figures[i][-1])
+                sprite1 = BDomino(self.figures[i][-1])
                 sprite1.rect.x = self.figures[i][1][0]
                 sprite1.rect.y = self.figures[i][1][1]
                 figures.add(sprite1)
                 if self.figures[i][2] == 1:
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0] + 35
                     sprite1.rect.y = self.figures[i][1][1]
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0] - 35
                     sprite1.rect.y = self.figures[i][1][1]
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0]
                     sprite1.rect.y = self.figures[i][1][1] + 35
                     figures.add(sprite1)
                 elif self.figures[i][2] == 2:
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0] - 35
                     sprite1.rect.y = self.figures[i][1][1]
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0]
                     sprite1.rect.y = self.figures[i][1][1] + 35
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0]
                     sprite1.rect.y = self.figures[i][1][1] - 35
                     figures.add(sprite1)
                 elif self.figures[i][2] == 3:
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0] + 35
                     sprite1.rect.y = self.figures[i][1][1]
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0] - 35
                     sprite1.rect.y = self.figures[i][1][1]
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0]
                     sprite1.rect.y = self.figures[i][1][1] - 35
                     figures.add(sprite1)
                 elif self.figures[i][2] == 4:
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0] + 35
                     sprite1.rect.y = self.figures[i][1][1]
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0]
                     sprite1.rect.y = self.figures[i][1][1] + 35
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0]
                     sprite1.rect.y = self.figures[i][1][1] - 35
                     figures.add(sprite1)
             elif self.figures[i][0] == 5:
-                sprite1 = Bmino(self.figures[i][-1])
+                sprite1 = BDomino(self.figures[i][-1])
                 sprite1.rect.x = self.figures[i][1][0]
                 sprite1.rect.y = self.figures[i][1][1]
                 figures.add(sprite1)
-                sprite1 = Bmino(self.figures[i][-1])
+                sprite1 = BDomino(self.figures[i][-1])
                 sprite1.rect.x = self.figures[i][1][0] - 35
                 sprite1.rect.y = self.figures[i][1][1]
                 figures.add(sprite1)
                 if self.figures[i][2] == 2:
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0] - 35
                     sprite1.rect.y = self.figures[i][1][1] - 35
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0]
                     sprite1.rect.y = self.figures[i][1][1] + 35
                     figures.add(sprite1)
                 elif self.figures[i][2] == 1:
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0]
                     sprite1.rect.y = self.figures[i][1][1] - 35
                     figures.add(sprite1)
-                    sprite1 = Bmino(self.figures[i][-1])
+                    sprite1 = BDomino(self.figures[i][-1])
                     sprite1.rect.x = self.figures[i][1][0] + 35
                     sprite1.rect.y = self.figures[i][1][1] - 35
                     figures.add(sprite1)

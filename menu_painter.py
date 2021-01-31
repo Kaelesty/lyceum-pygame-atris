@@ -11,6 +11,11 @@ class MenuPainter:
     def __init__(self, screen):
         self.surface = screen
         self.buttons = False
+        self.falls = pygame.sprite.Group()
+        self.buttons = pygame.sprite.Group()
+        self.tetris = Tetris(self.surface, "easy", (465, 0))
+        self.btris = Btris(self.surface, 5, (10, 10))
+        self.welltris = Welltris(self.surface, "easy", (10, 10))
 
     def init_main_menu(self):
         self.buttons = pygame.sprite.Group()
@@ -123,7 +128,7 @@ class MenuPainter:
     def draw_notes(self):
         notes = pygame.sprite.Group()
         sprite = pygame.sprite.Sprite()
-        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+        sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
                                          "notes.png")
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 0
@@ -135,7 +140,7 @@ class MenuPainter:
         self.surface.fill((30, 30, 30))
         logo = pygame.sprite.Group()
         sprite = pygame.sprite.Sprite()
-        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+        sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
                                          'logo_0' + '1' + '.png')
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 319
@@ -144,7 +149,7 @@ class MenuPainter:
         logo.draw(self.surface)
         button = pygame.sprite.Group()
         sprite = pygame.sprite.Sprite()
-        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+        sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
                                          "push_me.png")
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = random.choice([479, 480, 481, 479, 480, 481, 479, 480, 481, 480,
@@ -159,21 +164,21 @@ class MenuPainter:
         self.surface.fill((30, 30, 30))
         atris = pygame.sprite.Group()
         sprite = pygame.sprite.Sprite(atris)
-        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+        sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
                                          "background.png")
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 0
         sprite.rect.y = 0
         atris.add(sprite)
         sprite = pygame.sprite.Sprite(atris)
-        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+        sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
                                          "atris.png")
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 5
         sprite.rect.y = 5
         atris.add(sprite)
         sprite = pygame.sprite.Sprite(atris)
-        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+        sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
                                          "volume.png")
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 83
@@ -195,7 +200,7 @@ class MenuPainter:
             break
         if min_y > 67 or min_y == -666:
             sprite = pygame.sprite.Sprite()
-            sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+            sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
                                              "main_falls.png")
             sprite.rect = sprite.image.get_rect()
             sprite.rect.x = random.choice([1200, 1170, 1140, 1110, 1080, 1050, 1020, 990, 960, 930, 900])
@@ -209,7 +214,7 @@ class MenuPainter:
     def draw_selector(self):
         decorations = pygame.sprite.Group()
         sprite = pygame.sprite.Sprite()
-        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+        sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
                                          "border.png")
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 0
@@ -217,14 +222,14 @@ class MenuPainter:
         decorations.add(sprite)
         # Tetris Decorations
         sprite = pygame.sprite.Sprite()
-        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+        sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
                                          "tetris_border.png")
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 50
         sprite.rect.y = 50
         decorations.add(sprite)
         sprite = pygame.sprite.Sprite()
-        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+        sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
                                          "tetris_st.png")
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 120
@@ -232,14 +237,14 @@ class MenuPainter:
         decorations.add(sprite)
         # Btris Decorations
         sprite = pygame.sprite.Sprite()
-        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+        sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
                                          "btris_border.png")
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 450
         sprite.rect.y = 50
         decorations.add(sprite)
         sprite = pygame.sprite.Sprite()
-        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+        sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
                                          "btris_logo.png")
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 520
@@ -247,14 +252,14 @@ class MenuPainter:
         decorations.add(sprite)
         # Welltris Decorations
         sprite = pygame.sprite.Sprite()
-        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+        sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
                                          "welltris_border.png")
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 850
         sprite.rect.y = 50
         decorations.add(sprite)
         sprite = pygame.sprite.Sprite()
-        sprite.image = pygame.image.load("Data\ "[0:-1] + 'Sprites\ '[0:-1] +
+        sprite.image = pygame.image.load("Data\\" + "Sprites\\" +
                                          "welltris_st.png")
         sprite.rect = sprite.image.get_rect()
         sprite.rect.x = 930
@@ -266,9 +271,9 @@ class MenuPainter:
         self.draw_results()
 
     def draw_results(self):
-        con = sqlite3.connect("Data\ "[0:-1] + "AData.sqlite")
+        con = sqlite3.connect("Data\\" + "AData.sqlite")
         cur = con.cursor()
-        font = pygame.font.Font("Data\ "[0:-1] + "Konstanting.ttf", 30)
+        font = pygame.font.Font("Data\\" + "Konstanting.ttf", 30)
 
         data = cur.execute(f"SELECT Classic_easy FROM Scores").fetchall()[0][0]
         text = font.render("Best:", True, (255, 190, 15))
@@ -359,7 +364,6 @@ class MenuPainter:
         text_x = 1020
         text_y = 450
         self.surface.blit(text, (text_x, text_y))
-
 
     def draw_and_step(self):
         self.tetris.make_step()
